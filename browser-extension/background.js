@@ -303,31 +303,68 @@ async function createLocalBookmark({ url, title, folder }) {
 
 // ---- Sync-Status (letzter bekannter Stand pro lokaler Browser-ID) -----
 
-async function loadSyncState() {
-    const { syncState } = await browser.storage.local.get(['syncState']);
-    return syncState || {};
+// Der Sync-Zustand wird pro Server+Konto getrennt gespeichert (nicht
+// unter einem einzigen festen Schlüssel). Sonst würde ein Wechsel der
+// Nextcloud-URL/des Benutzernamens (z.B. von einer Test- auf die
+// produktive Instanz) den alten Zustand einer komplett anderen Cloud
+// weiterverwenden - und Schritt 1 von syncBookmarks() würde jedes lokal
+// bekannte Lesezeichen als "auf dem (neuen) Server gelöscht" ansehen und
+// es prompt auch lokal löschen. Mit einem eigenen Schlüssel pro Profil
+// startet ein Wechsel zu einem neuen/anderen Server dagegen mit einem
+// leeren, unbelasteten Zustand.
+function profileStorageKey(settings, baseName) {
+    return `${baseName}::${settings.serverUrl}::${settings.username}`;
 }
 
-async function saveSyncState(state) {
-    await browser.storage.local.set({ syncState: state });
+async function loadSyncState(settings) {
+    const key = profileStorageKey(settings, 'syncState');
+    const data = await browser.storage.local.get([key]);
+    return data[key] || {};
+}
+
+async function saveSyncState(settings, state) {
+    const key = profileStorageKey(settings, 'syncState');
+    await browser.storage.local.set({ [key]: state });
 }
 
 // ---- Der eigentliche Zwei-Wege-Abgleich --------------------------------
 
+// Verhindert, dass zwei Syncs gleichzeitig laufen: Das Herunterladen
+// neuer Lesezeichen ruft browser.bookmarks.create() auf, was die
+// onCreated-Ereignisse auslöst, auf die scheduleQuickSync() wiederum
+// reagiert - ein Sync würde sich damit sonst selbst 5 Sekunden später
+// nochmal anstoßen, während der erste eventuell noch läuft. Zwei
+// gleichzeitig laufende Syncs würden sich beim WebDAV-Backend zudem
+// gegenseitig die Konflikterkennung (Last-Modified) auslösen lassen.
+let syncInProgress = false;
+
 async function syncBookmarks() {
+    if (syncInProgress) {
+        return { success: true, created: 0, updated: 0, deleted: 0, conflicts: 0 };
+    }
+    syncInProgress = true;
+    try {
+        return await runSync();
+    } finally {
+        syncInProgress = false;
+    }
+}
+
+async function runSync() {
     const settings = await getSettings();
     const backend = getBackend(settings);
-    const [remoteList, localListRaw, syncState, { skippedUrls }] = await Promise.all([
+    const skippedUrlsKey = profileStorageKey(settings, 'skippedUrls');
+    const [remoteList, localListRaw, syncState, skippedData] = await Promise.all([
         backend.fetchRemoteBookmarks(settings),
         getLocalBookmarksFlat(),
-        loadSyncState(),
-        browser.storage.local.get(['skippedUrls']),
+        loadSyncState(settings),
+        browser.storage.local.get([skippedUrlsKey]),
     ]);
 
     // Lesezeichen, die beim ersten Start bewusst NICHT importiert wurden,
     // werden komplett aus dem Abgleich herausgefiltert (weder hoch- noch
     // heruntergeladen, weder gelöscht noch aktualisiert).
-    const skipSet = new Set(skippedUrls || []);
+    const skipSet = new Set(skippedData[skippedUrlsKey] || []);
     const localList = localListRaw.filter(b => !skipSet.has(b.url));
 
     const remoteById = new Map(remoteList.map(b => [String(b.id), b]));
@@ -444,7 +481,7 @@ async function syncBookmarks() {
     }
 
     await backend.commit(settings);
-    await saveSyncState(newSyncState);
+    await saveSyncState(settings, newSyncState);
     return { success: true, created, updated, deleted, conflicts };
 }
 
@@ -503,6 +540,14 @@ browser.alarms.onAlarm.addListener(alarm => {
 // damit nicht bei jeder einzelnen Änderung sofort ein Sync losläuft)
 let debounceTimer = null;
 function scheduleQuickSync() {
+    // Läuft gerade schon ein Sync, kommt diese Änderung höchstwahrscheinlich
+    // von ihm selbst (heruntergeladene Lesezeichen werden lokal angelegt,
+    // was wiederum dieses Ereignis auslöst) - nicht nochmal einen Folge-
+    // Sync einplanen. Eine tatsächliche, unabhängige Nutzeränderung
+    // während eines laufenden Syncs wird spätestens beim nächsten
+    // automatischen oder manuellen Sync erfasst.
+    if (syncInProgress) return;
+
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
         syncBookmarks().catch(err => console.error('Sync nach Änderung fehlgeschlagen:', err));

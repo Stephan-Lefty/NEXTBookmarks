@@ -42,9 +42,13 @@ document.getElementById('importNo').addEventListener('click', async () => {
     // Die aktuell vorhandenen Lesezeichen merken wir uns als "übersprungen":
     // Der Sync ignoriert diese URLs dauerhaft, bis du sie manuell importierst
     // (siehe Einstellungen). Neue Lesezeichen ab jetzt werden ganz normal
-    // synchronisiert.
+    // synchronisiert. Pro Server+Konto getrennt gespeichert (siehe
+    // background.js), damit ein späterer Wechsel der Nextcloud-Verbindung
+    // nicht die Skip-Liste einer ganz anderen Cloud übernimmt.
+    const { serverUrl, username } = await chrome.storage.sync.get(['serverUrl', 'username']);
+    const skippedUrlsKey = `skippedUrls::${serverUrl}::${username}`;
     const urls = await getLocalBookmarkUrls();
-    await chrome.storage.local.set({ skippedUrls: urls, importDecisionPending: false });
+    await chrome.storage.local.set({ [skippedUrlsKey]: urls, importDecisionPending: false });
 
     statusEl.textContent = chrome.i18n.getMessage('onboardingSkippedStatus');
 });
