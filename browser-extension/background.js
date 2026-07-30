@@ -119,8 +119,12 @@ async function ensureLocalFolder(path) {
         let match = currentNodes.find(n => !n.url && n.title === part);
 
         if (!match) {
+            // '1' = Lesezeichenleiste. Kein Fallback auf die Wurzel ('0')
+            // verwenden - Chrome/Chromium verbieten das Anlegen von
+            // Einträgen direkt unter der Wurzel ("Can't modify the root
+            // bookmark folders.").
             match = await browser.bookmarks.create({
-                parentId: parentId || currentNodes[0]?.parentId || '1',
+                parentId: parentId || '1',
                 title: part,
             });
         }
