@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5AA9FF"/>
+      <stop offset="55%" stop-color="#2E7EEA"/>
+      <stop offset="100%" stop-color="#0B5FCC"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#04326b" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Lesezeichen-Grundform: oben abgerundet, unten spitz zulaufend -->
+  <g filter="url(#softShadow)">
+    <path d="M22 20
+             a12 12 0 0 1 12 -12
+             H94
+             a12 12 0 0 1 12 12
+             V114
+             L64 90
+             L22 114
+             Z"
+          fill="url(#blue)" stroke="#083A80" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- dezenter Glanz oben links, damit die Form nicht flach wirkt -->
+    <path d="M22 20 a12 12 0 0 1 12 -12 H94 a12 12 0 0 1 12 12 V50 H22 Z"
+          fill="url(#sheen)"/>
+  </g>
+
+  <!-- Sync-Symbol: zwei gleichmäßige Halbkreis-Pfeile -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="6.5" stroke-linecap="round">
+    <path d="M45 52 A19 19 0 0 1 81 45"/>
+    <path d="M83 68 A19 19 0 0 1 47 75"/>
+  </g>
+  <g fill="#FFFFFF">
+    <polygon points="81,45 91,44 85,56"/>
+    <polygon points="47,75 37,76 43,64"/>
+  </g>
+</svg>

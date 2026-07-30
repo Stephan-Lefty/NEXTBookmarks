@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"><title>Nextbookmark – Einstellungen</title></head>
+<body>
+    <h3>Nextcloud-Verbindung</h3>
+    <label>Nextcloud-URL: <input id="serverUrl" placeholder="https://meine-cloud.example.com"></label><br>
+    <label>Benutzername: <input id="username"></label><br>
+    <label>App-Passwort: <input id="appPassword" type="password"></label><br>
+    <button id="save">Speichern</button>
+    <p id="status"></p>
+
+    <hr>
+    <h3>Import</h3>
+    <p>Hast du beim ersten Start den Import übersprungen? Hier kannst du ihn nachholen.</p>
+    <button id="importSkipped">Übersprungene Lesezeichen jetzt importieren</button>
+    <p id="importStatus"></p>
+
+    <script src="options.js"></script>
+</body>
+</html>
