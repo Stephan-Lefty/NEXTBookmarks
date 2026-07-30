@@ -5,6 +5,9 @@
     "popupSyncButton": {
         "message": "Sync now"
     },
+    "popupSettingsButton": {
+        "message": "Settings"
+    },
     "popupStatusReady": {
         "message": "Ready."
     },

@@ -1,26 +1,57 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title data-i18n="optionsPageTitle">NEXTBookmarks</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="optionsPageTitle">NEXTBookmarks</title>
+    <link rel="stylesheet" href="options.css">
+</head>
 <body>
-    <h3 data-i18n="optionsConnectionHeading"></h3>
-    <label><span data-i18n="optionsSyncModeLabel"></span>
-        <select id="syncMode">
-            <option value="rest" data-i18n="optionsSyncModeRest"></option>
-            <option value="webdav" data-i18n="optionsSyncModeWebdav"></option>
-        </select>
-    </label><br>
-    <p id="syncModeHint" data-i18n="optionsSyncModeRestHint"></p>
-    <label><span data-i18n="optionsServerUrlLabel"></span> <input id="serverUrl" placeholder="https://meine-cloud.example.com"></label><br>
-    <label><span data-i18n="optionsUsernameLabel"></span> <input id="username"></label><br>
-    <label><span data-i18n="optionsAppPasswordLabel"></span> <input id="appPassword" type="password"></label><br>
-    <button id="save" data-i18n="optionsSaveButton"></button>
-    <p id="status"></p>
+    <header>
+        <img src="icons/icon48.png" alt="">
+        <h1>NEXTBookmarks</h1>
+    </header>
 
-    <hr>
-    <h3 data-i18n="optionsImportHeading"></h3>
-    <p data-i18n="optionsImportDescription"></p>
-    <button id="importSkipped" data-i18n="optionsImportSkippedButton"></button>
-    <p id="importStatus"></p>
+    <section class="card">
+        <h2 data-i18n="optionsConnectionHeading"></h2>
+
+        <div class="field">
+            <label for="syncMode" data-i18n="optionsSyncModeLabel"></label>
+            <select id="syncMode">
+                <option value="rest" data-i18n="optionsSyncModeRest"></option>
+                <option value="webdav" data-i18n="optionsSyncModeWebdav"></option>
+            </select>
+            <p id="syncModeHint" class="hint" data-i18n="optionsSyncModeRestHint"></p>
+        </div>
+
+        <div class="field">
+            <label for="serverUrl" data-i18n="optionsServerUrlLabel"></label>
+            <input id="serverUrl" placeholder="https://meine-cloud.example.com">
+        </div>
+
+        <div class="field">
+            <label for="username" data-i18n="optionsUsernameLabel"></label>
+            <input id="username">
+        </div>
+
+        <div class="field">
+            <label for="appPassword" data-i18n="optionsAppPasswordLabel"></label>
+            <input id="appPassword" type="password">
+        </div>
+
+        <div class="actions">
+            <button id="save" class="primary" data-i18n="optionsSaveButton"></button>
+            <span id="status" class="status"></span>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2 data-i18n="optionsImportHeading"></h2>
+        <p data-i18n="optionsImportDescription"></p>
+        <div class="actions">
+            <button id="importSkipped" data-i18n="optionsImportSkippedButton"></button>
+            <span id="importStatus" class="status"></span>
+        </div>
+    </section>
 
     <script src="i18n.js"></script>
     <script src="options.js"></script>
