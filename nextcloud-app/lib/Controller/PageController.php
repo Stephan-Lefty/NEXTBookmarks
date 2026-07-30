@@ -2,6 +2,8 @@
 namespace OCA\Nextbookmark\Controller;
 
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 
@@ -14,6 +16,8 @@ class PageController extends Controller {
         parent::__construct($appName, $request);
     }
 
+    #[NoCSRFRequired]
+    #[NoAdminRequired]
     public function index(): TemplateResponse {
         // Rendert templates/main.php und bindet automatisch
         // die CSS/JS-Dateien aus css/ und js/ ein (siehe main.php)
