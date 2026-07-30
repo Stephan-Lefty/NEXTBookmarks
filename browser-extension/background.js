@@ -54,6 +54,13 @@ async function apiRequest(settings, path, options = {}) {
     const { serverUrl, username, appPassword } = settings;
     const response = await fetch(`${serverUrl}/ocs/v2.php/apps/nextbookmarks/api${path}`, {
         ...options,
+        // Cookies bewusst nicht mitschicken: Ist derselbe Browser noch
+        // parallel per Web-Login bei dieser Nextcloud eingeloggt (z.B. weil
+        // man in den Dateien nachgeschaut hat), erkennt Nextcloud das
+        // Sitzungs-Cookie und verlangt dann CSRF-Schutz - das App-Passwort
+        // im Authorization-Header würde dabei ignoriert. "omit" erzwingt,
+        // dass ausschließlich das App-Passwort zählt.
+        credentials: 'omit',
         headers: {
             'Authorization': authHeader(username, appPassword),
             'OCS-APIRequest': 'true',
@@ -89,10 +96,14 @@ const restBackend = {
 // als eine einzige JSON-Datei im Ordner "NEXTBookmarks" im Dateien-
 // Bereich des Nutzers. Ein Sync lädt die Datei einmal komplett, sammelt
 // alle Änderungen im Speicher und schreibt am Ende einmal die
-// aktualisierte Datei zurück. Der zuletzt gelesene ETag wird dabei als
-// "If-Match"-Bedingung mitgeschickt: Hat ein anderes Gerät die Datei
-// zwischenzeitlich geändert, schlägt das Schreiben ab, statt die fremde
-// Änderung stillschweigend zu überschreiben.
+// aktualisierte Datei zurück. Der zuletzt gelesene "Last-Modified"-
+// Zeitstempel wird dabei als "If-Unmodified-Since"-Bedingung mitgeschickt:
+// Hat ein anderes Gerät die Datei zwischenzeitlich geändert, schlägt das
+// Schreiben ab, statt die fremde Änderung stillschweigend zu überschreiben.
+// (Nicht der ETag, denn den darf JavaScript bei einer Cross-Origin-
+// Anfrage aus der Extension heraus gar nicht auslesen - "ETag" gehört
+// nicht zu den von fetch() standardmäßig freigegebenen Antwort-Headern,
+// "Last-Modified" dagegen schon.)
 
 const WEBDAV_FOLDER = 'NEXTBookmarks';
 const WEBDAV_FILE = `${WEBDAV_FOLDER}/bookmarks.json`;
@@ -104,6 +115,9 @@ function webdavUrl(settings, path) {
 async function webdavRequest(settings, path, options = {}) {
     return fetch(webdavUrl(settings, path), {
         ...options,
+        // Siehe Kommentar in apiRequest() - erzwingt Basic-Auth statt
+        // eines eventuell vorhandenen Sitzungs-Cookies desselben Browsers.
+        credentials: 'omit',
         headers: {
             'Authorization': authHeader(settings.username, settings.appPassword),
             ...options.headers,
@@ -129,9 +143,13 @@ async function webdavLoad(settings) {
     const response = await webdavRequest(settings, WEBDAV_FILE);
 
     if (response.status === 404) {
-        settings._webdav = { items: [], etag: null, dirty: false };
+        settings._webdav = { items: [], lastModified: null, dirty: false };
     } else if (response.ok) {
-        settings._webdav = { items: await response.json(), etag: response.headers.get('ETag'), dirty: false };
+        settings._webdav = {
+            items: await response.json(),
+            lastModified: response.headers.get('Last-Modified'),
+            dirty: false,
+        };
     } else {
         throw new Error(chrome.i18n.getMessage('errorServerResponse', [String(response.status), WEBDAV_FILE]));
     }
@@ -175,9 +193,10 @@ async function webdavCommit(settings) {
 
     const headers = { 'Content-Type': 'application/json' };
     // Schreibschutz gegen gleichzeitige Änderungen von einem anderen
-    // Gerät: Existiert die Datei schon, muss ihr ETag noch stimmen;
-    // existiert sie noch nicht, darf sie das auch beim Schreiben nicht.
-    if (state.etag) headers['If-Match'] = state.etag;
+    // Gerät: Existiert die Datei schon, darf sie seit dem letzten Lesen
+    // nicht verändert worden sein; existiert sie noch nicht, darf sie das
+    // auch beim Schreiben immer noch nicht.
+    if (state.lastModified) headers['If-Unmodified-Since'] = state.lastModified;
     else headers['If-None-Match'] = '*';
 
     const response = await webdavRequest(settings, WEBDAV_FILE, {
