@@ -1,5 +1,5 @@
 <?php
-namespace OCA\Nextbookmark\Db;
+namespace OCA\Nextbookmarks\Db;
 
 use OCP\AppFramework\Db\Entity;
 

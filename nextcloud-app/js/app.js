@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 'routes'-Block - dafür braucht es OC.linkToOCS statt OC.generateUrl
     // (das nur URLs aus dem 'routes'-Block erzeugt und hier ins Leere,
     // sprich einen 404, laufen würde).
-    const apiUrl = OC.linkToOCS('apps/nextbookmark/api', 2) + 'bookmarks';
+    const apiUrl = OC.linkToOCS('apps/nextbookmarks/api', 2) + 'bookmarks';
 
     fetch(apiUrl, {
         headers: { 'requesttoken': OC.requestToken }

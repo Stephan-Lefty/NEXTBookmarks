@@ -1,5 +1,5 @@
 <?php
-namespace OCA\Nextbookmark\Migration;
+namespace OCA\Nextbookmarks\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -16,7 +16,7 @@ class Version000000Date20260730120000 extends SimpleMigrationStep {
         /** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
 
-        $table = $schema->getTable('nextbookmark_bookmarks');
+        $table = $schema->getTable('nextbookmarks_bookmarks');
         if (!$table->hasColumn('position')) {
             $table->addColumn('position', 'integer', [
                 'notnull' => true,

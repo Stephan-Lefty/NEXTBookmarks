@@ -9,7 +9,7 @@ return [
         ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
     ],
     'ocs' => [
-        // REST-API unter /ocs/v2.php/apps/nextbookmark/api/bookmarks
+        // REST-API unter /ocs/v2.php/apps/nextbookmarks/api/bookmarks
         // Diese Endpunkte ruft später die Browser-Extension auf.
         ['name' => 'bookmark#index',  'url' => '/api/bookmarks',      'verb' => 'GET'],
         ['name' => 'bookmark#create', 'url' => '/api/bookmarks',      'verb' => 'POST'],

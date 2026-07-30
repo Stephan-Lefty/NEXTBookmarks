@@ -1,7 +1,7 @@
 importScripts('browser-polyfill-shim.js');
 
 // =====================================================================
-// Nextbookmark – Sync-Engine
+// NEXTBookmarks – Sync-Engine
 // =====================================================================
 // Diese Datei gleicht die lokalen Browser-Lesezeichen zweiseitig mit
 // der Nextcloud-App ab. Um das nachvollziehbar zu halten, arbeitet sie
@@ -31,7 +31,7 @@ importScripts('browser-polyfill-shim.js');
 // zwei Geräten) reicht das.
 // =====================================================================
 
-const SYNC_ALARM_NAME = 'nextbookmark-auto-sync';
+const SYNC_ALARM_NAME = 'nextbookmarks-auto-sync';
 const SYNC_INTERVAL_MINUTES = 15;
 
 // ---- Einstellungen & HTTP-Hilfsfunktionen -----------------------------
@@ -52,7 +52,7 @@ function authHeader(username, appPassword) {
 
 async function apiRequest(settings, path, options = {}) {
     const { serverUrl, username, appPassword } = settings;
-    const response = await fetch(`${serverUrl}/ocs/v2.php/apps/nextbookmark/api${path}`, {
+    const response = await fetch(`${serverUrl}/ocs/v2.php/apps/nextbookmarks/api${path}`, {
         ...options,
         headers: {
             'Authorization': authHeader(username, appPassword),
