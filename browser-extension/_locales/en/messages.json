@@ -79,6 +79,18 @@
     "optionsImportSkippedButton": {
         "message": "Import skipped bookmarks now"
     },
+    "optionsBackupHeading": {
+        "message": "Backup"
+    },
+    "optionsBackupDescription": {
+        "message": "Saves all current bookmarks as a file on your computer - independent of sync, importable into any browser."
+    },
+    "optionsBackupButton": {
+        "message": "Export backup"
+    },
+    "optionsBackupDoneStatus": {
+        "message": "Saved!"
+    },
     "statusImporting": {
         "message": "Importing…"
     },
@@ -129,6 +141,13 @@
         "placeholders": {
             "status": { "content": "$1" },
             "path": { "content": "$2" }
+        }
+    },
+    "errorMassDeleteGuard": {
+        "message": "Safety abort: $count$ out of $known$ known bookmarks would be deleted - that's unusually many, so nothing was deleted. Please check that the correct server/account is configured before syncing again.",
+        "placeholders": {
+            "count": { "content": "$1" },
+            "known": { "content": "$2" }
         }
     }
 }

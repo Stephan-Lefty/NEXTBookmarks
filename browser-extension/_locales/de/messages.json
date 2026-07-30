@@ -79,6 +79,18 @@
     "optionsImportSkippedButton": {
         "message": "Übersprungene Lesezeichen jetzt importieren"
     },
+    "optionsBackupHeading": {
+        "message": "Sicherung"
+    },
+    "optionsBackupDescription": {
+        "message": "Speichert alle aktuellen Lesezeichen als Datei auf deinem Computer - unabhängig vom Sync, zum Import in jeden Browser."
+    },
+    "optionsBackupButton": {
+        "message": "Sicherungskopie exportieren"
+    },
+    "optionsBackupDoneStatus": {
+        "message": "Gespeichert!"
+    },
     "statusImporting": {
         "message": "Importiere…"
     },
@@ -129,6 +141,13 @@
         "placeholders": {
             "status": { "content": "$1" },
             "path": { "content": "$2" }
+        }
+    },
+    "errorMassDeleteGuard": {
+        "message": "Sicherheitsabbruch: $count$ von $known$ bekannten Lesezeichen würden gelöscht - das ist ungewöhnlich viel und wurde daher NICHT ausgeführt. Bitte prüfen, ob wirklich der richtige Server/das richtige Konto eingetragen ist, bevor erneut synchronisiert wird.",
+        "placeholders": {
+            "count": { "content": "$1" },
+            "known": { "content": "$2" }
         }
     }
 }

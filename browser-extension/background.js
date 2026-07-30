@@ -373,6 +373,27 @@ async function runSync() {
     // zugeordnet wurden, damit Schritt 2 sie nicht nochmal anfasst.
     const handledRemoteIds = new Set();
 
+    // Sicherheitsbremse: Ein fehlerhafter/veralteter Sync-Zustand (genau
+    // das ist uns schon zweimal passiert, z.B. beim Wechsel auf einen
+    // anderen Server) kann dazu führen, dass praktisch jedes lokal
+    // bekannte Lesezeichen fälschlich als "auf dem Server gelöscht"
+    // erscheint - der Sync würde dann massenhaft ECHTE Browser-
+    // Lesezeichen löschen, die sich (anders als serverseitige Daten)
+    // nicht ohne Weiteres wiederherstellen lassen. Bevor irgendetwas
+    // gelöscht wird: einmal durchzählen, wie viele lokale Löschungen
+    // anstehen würden, und bei einem verdächtig hohen Anteil den
+    // kompletten Sync lieber mit einem Fehler abbrechen statt zu löschen.
+    const localIdSet = new Set(localList.map(b => b.localId));
+    const knownCount = Object.keys(syncState).length;
+    const pendingLocalDeletes = Object.keys(syncState).filter(localId =>
+        localIdSet.has(localId) && !remoteById.has(String(syncState[localId].remoteId))
+    ).length;
+    const MASS_DELETE_MIN = 5;
+    const MASS_DELETE_RATIO = 0.5;
+    if (knownCount >= MASS_DELETE_MIN && pendingLocalDeletes > knownCount * MASS_DELETE_RATIO) {
+        throw new Error(chrome.i18n.getMessage('errorMassDeleteGuard', [String(pendingLocalDeletes), String(knownCount)]));
+    }
+
     let created = 0, updated = 0, deleted = 0, conflicts = 0;
 
     // 1) Alle lokalen Lesezeichen anhand ihrer stabilen Browser-ID abgleichen.

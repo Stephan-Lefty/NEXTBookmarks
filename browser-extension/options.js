@@ -49,3 +49,10 @@ document.getElementById('importSkipped').addEventListener('click', async () => {
         ? chrome.i18n.getMessage('importDoneStatus', [String(result.created)])
         : chrome.i18n.getMessage('genericError', [result?.error || chrome.i18n.getMessage('errorUnknown')]);
 });
+
+// Sicherungskopie exportieren - die eigentliche Logik steckt in der
+// gemeinsam genutzten Datei export-backup.js (auch vom Popup verwendet).
+document.getElementById('exportBackup').addEventListener('click', async () => {
+    await exportBookmarksBackup();
+    document.getElementById('backupStatus').textContent = chrome.i18n.getMessage('optionsBackupDoneStatus');
+});

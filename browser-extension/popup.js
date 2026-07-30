@@ -23,3 +23,11 @@ document.getElementById('openSettings').addEventListener('click', () => {
         height: 520,
     });
 });
+
+// Sicherungskopie exportieren - Logik in export-backup.js, auch von den
+// Einstellungen aus genutzt.
+document.getElementById('exportBackup').addEventListener('click', async () => {
+    const statusEl = document.getElementById('status');
+    await exportBookmarksBackup();
+    statusEl.textContent = chrome.i18n.getMessage('optionsBackupDoneStatus');
+});
