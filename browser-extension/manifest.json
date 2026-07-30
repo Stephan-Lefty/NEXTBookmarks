@@ -1,8 +1,9 @@
 {
     "manifest_version": 3,
+    "default_locale": "de",
     "name": "NEXTBookmarks",
     "version": "0.1.0",
-    "description": "Synchronisiert deine Browser-Lesezeichen mit deiner Nextcloud.",
+    "description": "__MSG_extDescription__",
     "permissions": ["bookmarks", "storage", "alarms"],
     "host_permissions": ["https://*/*", "http://localhost/*"],
     "background": {

@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(bookmarks => {
             const byFolder = new Map();
             bookmarks.forEach(b => {
-                const folder = b.folder || '(ohne Ordner)';
+                const folder = b.folder || t('nextbookmarks', '(no folder)');
                 if (!byFolder.has(folder)) byFolder.set(folder, []);
                 byFolder.get(folder).push(b);
             });
@@ -27,9 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ordner hier zum ersten Mal auftauchen, entspricht daher der
             // tatsächlichen Reihenfolge im Browser. Map behält die
             // Einfüge-Reihenfolge bei, daher hier bewusst keine eigene
-            // (z.B. alphabetische) Sortierung mehr - außer für "Papierkorb"-
-            // Ordner, die auf Wunsch immer ans Ende sollen.
-            const isTrash = (folder) => folder.split('/').pop() === 'Papierkorb';
+            // (z.B. alphabetische) Sortierung mehr - außer für Papierkorb-
+            // Ordner, die auf Wunsch immer ans Ende sollen. Der Ordnername
+            // kommt vom Browser des Nutzers, nicht von unserer eigenen
+            // Übersetzung - daher hier beide gängigen Sprachvarianten prüfen.
+            const TRASH_FOLDER_NAMES = ['Papierkorb', 'Trash'];
+            const isTrash = (folder) => TRASH_FOLDER_NAMES.includes(folder.split('/').pop());
             const orderedFolders = [...byFolder.keys()];
             const normalFolders = orderedFolders.filter(f => !isTrash(f));
             const trashFolders = orderedFolders.filter(isTrash);

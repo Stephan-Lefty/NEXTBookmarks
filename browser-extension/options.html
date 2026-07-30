@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="de">
-<head><meta charset="UTF-8"><title>NEXTBookmarks – Einstellungen</title></head>
+<html>
+<head><meta charset="UTF-8"><title data-i18n="optionsPageTitle">NEXTBookmarks</title></head>
 <body>
-    <h3>Nextcloud-Verbindung</h3>
-    <label>Nextcloud-URL: <input id="serverUrl" placeholder="https://meine-cloud.example.com"></label><br>
-    <label>Benutzername: <input id="username"></label><br>
-    <label>App-Passwort: <input id="appPassword" type="password"></label><br>
-    <button id="save">Speichern</button>
+    <h3 data-i18n="optionsConnectionHeading"></h3>
+    <label><span data-i18n="optionsServerUrlLabel"></span> <input id="serverUrl" placeholder="https://meine-cloud.example.com"></label><br>
+    <label><span data-i18n="optionsUsernameLabel"></span> <input id="username"></label><br>
+    <label><span data-i18n="optionsAppPasswordLabel"></span> <input id="appPassword" type="password"></label><br>
+    <button id="save" data-i18n="optionsSaveButton"></button>
     <p id="status"></p>
 
     <hr>
-    <h3>Import</h3>
-    <p>Hast du beim ersten Start den Import übersprungen? Hier kannst du ihn nachholen.</p>
-    <button id="importSkipped">Übersprungene Lesezeichen jetzt importieren</button>
+    <h3 data-i18n="optionsImportHeading"></h3>
+    <p data-i18n="optionsImportDescription"></p>
+    <button id="importSkipped" data-i18n="optionsImportSkippedButton"></button>
     <p id="importStatus"></p>
 
+    <script src="i18n.js"></script>
     <script src="options.js"></script>
 </body>
 </html>

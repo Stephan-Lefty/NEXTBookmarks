@@ -13,7 +13,7 @@ document.getElementById('save').addEventListener('click', async () => {
     const appPassword = document.getElementById('appPassword').value;
 
     await chrome.storage.sync.set({ serverUrl, username, appPassword });
-    document.getElementById('status').textContent = 'Gespeichert!';
+    document.getElementById('status').textContent = chrome.i18n.getMessage('optionsSavedStatus');
 
     // Falls noch offen: jetzt, wo Zugangsdaten vorhanden sind, die
     // "vorhandene Lesezeichen importieren?"-Frage anzeigen.
@@ -22,7 +22,7 @@ document.getElementById('save').addEventListener('click', async () => {
 
 document.getElementById('importSkipped').addEventListener('click', async () => {
     const importStatusEl = document.getElementById('importStatus');
-    importStatusEl.textContent = 'Importiere...';
+    importStatusEl.textContent = chrome.i18n.getMessage('statusImporting');
 
     // Skip-Liste leeren, damit die zuvor übersprungenen Lesezeichen beim
     // nächsten Sync ganz normal wie neue lokale Lesezeichen behandelt
@@ -31,6 +31,6 @@ document.getElementById('importSkipped').addEventListener('click', async () => {
     const result = await chrome.runtime.sendMessage({ action: 'sync' });
 
     importStatusEl.textContent = result?.success
-        ? `Fertig! ${result.created} Lesezeichen importiert.`
-        : `Fehler: ${result?.error || 'unbekannt'}`;
+        ? chrome.i18n.getMessage('importDoneStatus', [String(result.created)])
+        : chrome.i18n.getMessage('genericError', [result?.error || chrome.i18n.getMessage('errorUnknown')]);
 });

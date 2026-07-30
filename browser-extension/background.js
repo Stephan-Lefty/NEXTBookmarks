@@ -41,7 +41,7 @@ async function getSettings() {
         'serverUrl', 'username', 'appPassword'
     ]);
     if (!serverUrl || !username || !appPassword) {
-        throw new Error('Bitte zuerst die Nextcloud-Zugangsdaten in den Einstellungen eintragen.');
+        throw new Error(chrome.i18n.getMessage('errorMissingCredentials'));
     }
     return { serverUrl, username, appPassword };
 }
@@ -62,7 +62,7 @@ async function apiRequest(settings, path, options = {}) {
             ...options.headers,
         },
     });
-    if (!response.ok) throw new Error(`Server antwortete mit ${response.status} bei ${path}`);
+    if (!response.ok) throw new Error(chrome.i18n.getMessage('errorServerResponse', [String(response.status), path]));
     if (response.status === 204) return null;
     return response.json();
 }

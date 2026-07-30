@@ -3,8 +3,10 @@
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>nextbookmarks</id>
     <name>NEXTBookmarks</name>
-    <summary>Browser- und OS-unabhängige Lesezeichen-Synchronisation</summary>
-    <description>Speichert Lesezeichen zentral in Nextcloud und synchronisiert sie über eine REST-API mit einer Browser-Extension.</description>
+    <summary>Browser- and OS-independent bookmark synchronization</summary>
+    <summary lang="de">Browser- und OS-unabhängige Lesezeichen-Synchronisation</summary>
+    <description>Stores bookmarks centrally in Nextcloud and synchronizes them via a REST API with a browser extension.</description>
+    <description lang="de">Speichert Lesezeichen zentral in Nextcloud und synchronisiert sie über eine REST-API mit einer Browser-Extension.</description>
     <version>0.1.0</version>
     <licence>agpl</licence>
     <author>Stephan-Lefty</author>
