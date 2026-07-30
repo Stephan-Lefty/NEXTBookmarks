@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 document.getElementById('importYes').addEventListener('click', async () => {
     const statusEl = document.getElementById('status');
-    statusEl.textContent = 'Importiere...';
+    statusEl.textContent = chrome.i18n.getMessage('statusImporting');
 
     // Löst denselben Sync aus wie der Button im Popup – lädt alle
     // vorhandenen lokalen Lesezeichen zur Nextcloud hoch.
@@ -32,8 +32,8 @@ document.getElementById('importYes').addEventListener('click', async () => {
     await chrome.storage.local.set({ importDecisionPending: false });
 
     statusEl.textContent = result?.success
-        ? `Fertig! ${result.created} Lesezeichen importiert. Dieses Fenster kannst du jetzt schließen.`
-        : `Fehler beim Import: ${result?.error || 'unbekannt'}`;
+        ? chrome.i18n.getMessage('onboardingImportDoneStatus', [String(result.created)])
+        : chrome.i18n.getMessage('onboardingImportErrorStatus', [result?.error || chrome.i18n.getMessage('errorUnknown')]);
 });
 
 document.getElementById('importNo').addEventListener('click', async () => {
@@ -46,5 +46,5 @@ document.getElementById('importNo').addEventListener('click', async () => {
     const urls = await getLocalBookmarkUrls();
     await chrome.storage.local.set({ skippedUrls: urls, importDecisionPending: false });
 
-    statusEl.textContent = 'Übersprungen – deine vorhandenen Lesezeichen bleiben unangetastet. Dieses Fenster kannst du jetzt schließen.';
+    statusEl.textContent = chrome.i18n.getMessage('onboardingSkippedStatus');
 });

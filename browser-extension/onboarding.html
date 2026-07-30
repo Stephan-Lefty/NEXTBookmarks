@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>NEXTBookmarks – Willkommen</title>
+    <title data-i18n="onboardingPageTitle">NEXTBookmarks</title>
     <style>
         body { font-family: sans-serif; max-width: 480px; margin: 40px auto; }
         button { padding: 8px 16px; margin-right: 8px; }
     </style>
 </head>
 <body>
-    <h2>Willkommen bei NEXTBookmarks</h2>
+    <h2 data-i18n="onboardingHeading"></h2>
     <p>
-        Du hast aktuell <strong id="count">…</strong> Lesezeichen in diesem Browser.
-        Sollen diese jetzt in deine Nextcloud importiert werden?
+        <span data-i18n="onboardingIntroPrefix"></span>
+        <strong id="count">…</strong>
+        <span data-i18n="onboardingIntroSuffix"></span>
     </p>
-    <button id="importYes">Ja, importieren</button>
-    <button id="importNo">Nein, überspringen</button>
+    <button id="importYes" data-i18n="onboardingImportYesButton"></button>
+    <button id="importNo" data-i18n="onboardingImportNoButton"></button>
     <p id="status"></p>
+    <script src="i18n.js"></script>
     <script src="onboarding.js"></script>
 </body>
 </html>

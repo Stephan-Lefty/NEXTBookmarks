@@ -1,0 +1,113 @@
+{
+    "extDescription": {
+        "message": "Synchronisiert deine Browser-Lesezeichen mit deiner Nextcloud."
+    },
+    "popupSyncButton": {
+        "message": "Jetzt synchronisieren"
+    },
+    "popupStatusReady": {
+        "message": "Bereit."
+    },
+    "popupStatusSyncing": {
+        "message": "Synchronisiere…"
+    },
+    "popupStatusDone": {
+        "message": "Fertig ($created$ neu, $updated$ aktualisiert, $deleted$ gelöscht).",
+        "placeholders": {
+            "created": { "content": "$1" },
+            "updated": { "content": "$2" },
+            "deleted": { "content": "$3" }
+        }
+    },
+    "genericError": {
+        "message": "Fehler: $error$",
+        "placeholders": {
+            "error": { "content": "$1" }
+        }
+    },
+    "errorUnknown": {
+        "message": "unbekannt"
+    },
+    "optionsPageTitle": {
+        "message": "NEXTBookmarks – Einstellungen"
+    },
+    "optionsConnectionHeading": {
+        "message": "Nextcloud-Verbindung"
+    },
+    "optionsServerUrlLabel": {
+        "message": "Nextcloud-URL:"
+    },
+    "optionsUsernameLabel": {
+        "message": "Benutzername:"
+    },
+    "optionsAppPasswordLabel": {
+        "message": "App-Passwort:"
+    },
+    "optionsSaveButton": {
+        "message": "Speichern"
+    },
+    "optionsSavedStatus": {
+        "message": "Gespeichert!"
+    },
+    "optionsImportHeading": {
+        "message": "Import"
+    },
+    "optionsImportDescription": {
+        "message": "Hast du beim ersten Start den Import übersprungen? Hier kannst du ihn nachholen."
+    },
+    "optionsImportSkippedButton": {
+        "message": "Übersprungene Lesezeichen jetzt importieren"
+    },
+    "statusImporting": {
+        "message": "Importiere…"
+    },
+    "importDoneStatus": {
+        "message": "Fertig! $created$ Lesezeichen importiert.",
+        "placeholders": {
+            "created": { "content": "$1" }
+        }
+    },
+    "onboardingPageTitle": {
+        "message": "NEXTBookmarks – Willkommen"
+    },
+    "onboardingHeading": {
+        "message": "Willkommen bei NEXTBookmarks"
+    },
+    "onboardingIntroPrefix": {
+        "message": "Du hast aktuell"
+    },
+    "onboardingIntroSuffix": {
+        "message": "Lesezeichen in diesem Browser. Sollen diese jetzt in deine Nextcloud importiert werden?"
+    },
+    "onboardingImportYesButton": {
+        "message": "Ja, importieren"
+    },
+    "onboardingImportNoButton": {
+        "message": "Nein, überspringen"
+    },
+    "onboardingImportDoneStatus": {
+        "message": "Fertig! $created$ Lesezeichen importiert. Dieses Fenster kannst du jetzt schließen.",
+        "placeholders": {
+            "created": { "content": "$1" }
+        }
+    },
+    "onboardingImportErrorStatus": {
+        "message": "Fehler beim Import: $error$",
+        "placeholders": {
+            "error": { "content": "$1" }
+        }
+    },
+    "onboardingSkippedStatus": {
+        "message": "Übersprungen – deine vorhandenen Lesezeichen bleiben unangetastet. Dieses Fenster kannst du jetzt schließen."
+    },
+    "errorMissingCredentials": {
+        "message": "Bitte zuerst die Nextcloud-Zugangsdaten in den Einstellungen eintragen."
+    },
+    "errorServerResponse": {
+        "message": "Server antwortete mit $status$ bei $path$",
+        "placeholders": {
+            "status": { "content": "$1" },
+            "path": { "content": "$2" }
+        }
+    }
+}

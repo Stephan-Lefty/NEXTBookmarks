@@ -1,0 +1,113 @@
+{
+    "extDescription": {
+        "message": "Syncs your browser bookmarks with your Nextcloud."
+    },
+    "popupSyncButton": {
+        "message": "Sync now"
+    },
+    "popupStatusReady": {
+        "message": "Ready."
+    },
+    "popupStatusSyncing": {
+        "message": "Syncing…"
+    },
+    "popupStatusDone": {
+        "message": "Done ($created$ new, $updated$ updated, $deleted$ deleted).",
+        "placeholders": {
+            "created": { "content": "$1" },
+            "updated": { "content": "$2" },
+            "deleted": { "content": "$3" }
+        }
+    },
+    "genericError": {
+        "message": "Error: $error$",
+        "placeholders": {
+            "error": { "content": "$1" }
+        }
+    },
+    "errorUnknown": {
+        "message": "unknown"
+    },
+    "optionsPageTitle": {
+        "message": "NEXTBookmarks – Settings"
+    },
+    "optionsConnectionHeading": {
+        "message": "Nextcloud connection"
+    },
+    "optionsServerUrlLabel": {
+        "message": "Nextcloud URL:"
+    },
+    "optionsUsernameLabel": {
+        "message": "Username:"
+    },
+    "optionsAppPasswordLabel": {
+        "message": "App password:"
+    },
+    "optionsSaveButton": {
+        "message": "Save"
+    },
+    "optionsSavedStatus": {
+        "message": "Saved!"
+    },
+    "optionsImportHeading": {
+        "message": "Import"
+    },
+    "optionsImportDescription": {
+        "message": "Did you skip the import on first run? You can catch up on it here."
+    },
+    "optionsImportSkippedButton": {
+        "message": "Import skipped bookmarks now"
+    },
+    "statusImporting": {
+        "message": "Importing…"
+    },
+    "importDoneStatus": {
+        "message": "Done! $created$ bookmarks imported.",
+        "placeholders": {
+            "created": { "content": "$1" }
+        }
+    },
+    "onboardingPageTitle": {
+        "message": "NEXTBookmarks – Welcome"
+    },
+    "onboardingHeading": {
+        "message": "Welcome to NEXTBookmarks"
+    },
+    "onboardingIntroPrefix": {
+        "message": "You currently have"
+    },
+    "onboardingIntroSuffix": {
+        "message": "bookmarks in this browser. Should these be imported into your Nextcloud now?"
+    },
+    "onboardingImportYesButton": {
+        "message": "Yes, import"
+    },
+    "onboardingImportNoButton": {
+        "message": "No, skip"
+    },
+    "onboardingImportDoneStatus": {
+        "message": "Done! $created$ bookmarks imported. You can close this window now.",
+        "placeholders": {
+            "created": { "content": "$1" }
+        }
+    },
+    "onboardingImportErrorStatus": {
+        "message": "Error during import: $error$",
+        "placeholders": {
+            "error": { "content": "$1" }
+        }
+    },
+    "onboardingSkippedStatus": {
+        "message": "Skipped – your existing bookmarks remain untouched. You can close this window now."
+    },
+    "errorMissingCredentials": {
+        "message": "Please enter your Nextcloud credentials in the settings first."
+    },
+    "errorServerResponse": {
+        "message": "Server responded with $status$ at $path$",
+        "placeholders": {
+            "status": { "content": "$1" },
+            "path": { "content": "$2" }
+        }
+    }
+}

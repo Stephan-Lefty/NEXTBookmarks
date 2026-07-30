@@ -6,6 +6,7 @@ use OCA\Nextbookmarks\Db\BookmarkMapper;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\IL10N;
 use OCP\IRequest;
 
 /**
@@ -16,16 +17,19 @@ use OCP\IRequest;
 class BookmarkController extends ApiController {
     private BookmarkMapper $mapper;
     private string $userId;
+    private IL10N $l10n;
 
     public function __construct(
         string $appName,
         IRequest $request,
         BookmarkMapper $mapper,
-        string $userId
+        string $userId,
+        IL10N $l10n
     ) {
         parent::__construct($appName, $request);
         $this->mapper = $mapper;
         $this->userId = $userId;
+        $this->l10n = $l10n;
     }
 
     // GET /api/bookmarks -> alle Lesezeichen des eingeloggten Nutzers
@@ -52,7 +56,7 @@ class BookmarkController extends ApiController {
         try {
             $bookmark = $this->mapper->findForUser($id, $this->userId);
         } catch (DoesNotExistException $e) {
-            return new DataResponse(['error' => 'Nicht gefunden'], 404);
+            return new DataResponse(['error' => $this->l10n->t('Not found')], 404);
         }
 
         if ($url !== null) $bookmark->setUrl($url);
@@ -70,7 +74,7 @@ class BookmarkController extends ApiController {
         try {
             $bookmark = $this->mapper->findForUser($id, $this->userId);
         } catch (DoesNotExistException $e) {
-            return new DataResponse(['error' => 'Nicht gefunden'], 404);
+            return new DataResponse(['error' => $this->l10n->t('Not found')], 404);
         }
 
         $this->mapper->delete($bookmark);

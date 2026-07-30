@@ -1,3 +1,5 @@
+[Deutsch](README.md) | [English](README.en.md)
+
 # NEXTBookmarks – Grundgerüst
 
 Ein Tool, das Browser-Lesezeichen zentral über eine selbst gehostete Nextcloud
