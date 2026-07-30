@@ -204,6 +204,41 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
 - **Icon**: `browser-extension/icons/` enthält ein blaues Icon in 16/48/128px
   (Lesezeichen-Form mit Sync-Pfeilen), erzeugt aus `icon-source.svg`.
   Dasselbe Icon liegt auch unter `nextcloud-app/img/` für die Web-Oberfläche.
+- **Web-Oberfläche** (innerhalb von Nextcloud, Menüpunkt "Nextbookmark"):
+  Lesezeichen werden nach Ordner gruppiert dargestellt; ein Klick auf
+  einen Ordner klappt Titel (fett) und URL (klickbar, öffnet in neuem
+  Tab) der enthaltenen Lesezeichen auf. Ordner erscheinen in derselben
+  Reihenfolge wie im Browser-Lesezeichenbaum, Papierkorb-Ordner immer
+  ganz am Ende. Die Textfarbe passt sich automatisch an das aktive
+  Nextcloud-Theme (hell/dunkel) an.
+
+## Entwicklung / lokale Änderungen testen
+
+Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
+(siehe Bereich C oben) prüfen willst, ob eine Änderung funktioniert:
+
+1. Geänderte Datei in den laufenden Container kopieren, z.B.:
+   ```
+   docker cp nextcloud-app/js/app.js nextcloud-test:/var/www/html/apps/nextbookmark/js/app.js
+   docker exec nextcloud-test chown www-data:www-data /var/www/html/apps/nextbookmark/js/app.js
+   ```
+2. **Nur bei Änderungen an einer Migration** (neue/geänderte Spalte in
+   `lib/Migration/`) zusätzlich die App einmal deaktivieren/aktivieren,
+   damit die Migration ausgeführt wird:
+   ```
+   docker exec -u www-data nextcloud-test php occ app:disable nextbookmark
+   docker exec -u www-data nextcloud-test php occ app:enable nextbookmark
+   ```
+3. **Browser-Cache beachten**: Nextcloud liefert `js/app.js` und
+   `css/style.css` mit einem sehr langen `Cache-Control`-Header aus
+   (mehrere Monate). Nach jeder Änderung an diesen beiden Dateien
+   unbedingt mit **Strg+Umschalt+R** (Hard-Reload) neu laden, sonst
+   sieht es so aus, als hätte sich nichts geändert, obwohl der Server
+   die neue Version längst ausliefert.
+4. Änderungen an `browser-extension/*.js` betreffen nicht den
+   Nextcloud-Container, sondern die geladene Erweiterung selbst: in
+   `chrome://extensions` bzw. `vivaldi://extensions` bei Nextbookmark
+   auf den Reload-Pfeil (⟳) klicken.
 
 ## Bekannte Grenzen / mögliche nächste Schritte
 
@@ -218,3 +253,9 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
 - Für sehr viele Lesezeichen (mehrere Tausend) wäre eine effizientere,
   inkrementelle API (z.B. "nur Änderungen seit Zeitpunkt X") sinnvoll statt
   jedes Mal die komplette Liste zu laden.
+
+## Bugs melden
+
+Die `<bugs>`-Adresse in `nextcloud-app/appinfo/info.xml` zeigt auf
+[github.com/Stephan-Lefty/nextbookmark/issues](https://github.com/Stephan-Lefty/nextbookmark/issues) -
+dort können Fehler und Ideen für nächste Schritte eingetragen werden.

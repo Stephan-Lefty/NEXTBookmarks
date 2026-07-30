@@ -52,7 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 bookmarkList.hidden = true;
                 folderBookmarks.forEach(b => {
                     const li = document.createElement('li');
-                    li.appendChild(document.createTextNode(`${b.title || b.url} (`));
+
+                    const strong = document.createElement('strong');
+                    strong.textContent = b.title || b.url;
+                    li.appendChild(strong);
+                    li.appendChild(document.createTextNode(' ('));
 
                     const link = document.createElement('a');
                     link.href = b.url;
