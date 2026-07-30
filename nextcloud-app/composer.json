@@ -1,10 +1,10 @@
 {
-    "name": "nextbookmark/nextbookmark",
+    "name": "nextbookmarks/nextbookmarks",
     "description": "Browser- und OS-unabhängige Lesezeichen-Synchronisation für Nextcloud",
     "license": "AGPL-3.0-or-later",
     "autoload": {
         "psr-4": {
-            "OCA\\Nextbookmark\\": "lib/"
+            "OCA\\Nextbookmarks\\": "lib/"
         }
     }
 }

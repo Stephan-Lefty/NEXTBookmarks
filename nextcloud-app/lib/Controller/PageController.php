@@ -1,5 +1,5 @@
 <?php
-namespace OCA\Nextbookmark\Controller;
+namespace OCA\Nextbookmarks\Controller;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -9,7 +9,7 @@ use OCP\IRequest;
 
 /**
  * Liefert die Web-Oberfläche (das "Frontend") aus, die innerhalb von
- * Nextcloud angezeigt wird, wenn man links im Menü auf "Nextbookmark" klickt.
+ * Nextcloud angezeigt wird, wenn man links im Menü auf "NEXTBookmarks" klickt.
  */
 class PageController extends Controller {
     public function __construct(string $appName, IRequest $request) {
@@ -21,6 +21,6 @@ class PageController extends Controller {
     public function index(): TemplateResponse {
         // Rendert templates/main.php und bindet automatisch
         // die CSS/JS-Dateien aus css/ und js/ ein (siehe main.php)
-        return new TemplateResponse('nextbookmark', 'main');
+        return new TemplateResponse('nextbookmarks', 'main');
     }
 }

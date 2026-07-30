@@ -1,8 +1,8 @@
 <?php
-namespace OCA\Nextbookmark\Controller;
+namespace OCA\Nextbookmarks\Controller;
 
-use OCA\Nextbookmark\Db\Bookmark;
-use OCA\Nextbookmark\Db\BookmarkMapper;
+use OCA\Nextbookmarks\Db\Bookmark;
+use OCA\Nextbookmarks\Db\BookmarkMapper;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Db\DoesNotExistException;

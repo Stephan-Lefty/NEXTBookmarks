@@ -1,4 +1,4 @@
-# Nextbookmark – Grundgerüst
+# NEXTBookmarks – Grundgerüst
 
 Ein Tool, das Browser-Lesezeichen zentral über eine selbst gehostete Nextcloud
 synchron hält – unabhängig von Browser und Betriebssystem.
@@ -8,7 +8,7 @@ Dieses Projekt ist in Zusammenarbeit mit [Claude](https://claude.com) entstanden
 ## Wie die beiden Teile zusammenspielen
 
 ```
-Chrome/Firefox/Edge  --(REST-API über HTTPS)-->  Nextcloud-App "nextbookmark"
+Chrome/Firefox/Edge  --(REST-API über HTTPS)-->  Nextcloud-App "nextbookmarks"
  (browser-extension/)                             (nextcloud-app/, PHP)
                                                           |
                                                      Nextcloud-Datenbank
@@ -30,7 +30,7 @@ Betriebssystem des Servers keine Rolle.
 ## Ordnerstruktur
 
 ```
-nextbookmark/
+nextbookmarks/
 ├── nextcloud-app/
 │   ├── appinfo/
 │   │   ├── info.xml         # App-Metadaten (Name, Version, ...)
@@ -68,18 +68,18 @@ ein Raspberry Pi zuhause oder ein gemieteter, unverwalteter Server
 (z.B. ein "Hetzner Cloud Server", auf dem du Nextcloud selbst installiert hast).
 
 1. Per SFTP/SSH auf den Server verbinden.
-2. Ordner `nextcloud-app` nach `nextbookmark` umbenennen und in den
+2. Ordner `nextcloud-app` nach `nextbookmarks` umbenennen und in den
    `apps/`-Ordner deiner Nextcloud-Installation kopieren
-   (typischerweise `/var/www/nextcloud/apps/nextbookmark`).
+   (typischerweise `/var/www/nextcloud/apps/nextbookmarks`).
 3. Rechte setzen, damit der Webserver-Nutzer die Dateien lesen kann, z.B.:
    ```
-   chown -R www-data:www-data /var/www/nextcloud/apps/nextbookmark
+   chown -R www-data:www-data /var/www/nextcloud/apps/nextbookmarks
    ```
    (Nutzername kann je nach Server auch `apache` o.ä. sein.)
 4. App aktivieren – entweder per Weboberfläche (Einstellungen → Apps →
-   "Nicht aktivierte Apps" → "Nextbookmark" aktivieren) oder per Konsole:
+   "Nicht aktivierte Apps" → "NEXTBookmarks" aktivieren) oder per Konsole:
    ```
-   sudo -u www-data php occ app:enable nextbookmark
+   sudo -u www-data php occ app:enable nextbookmarks
    ```
 5. Unter Nextcloud-Einstellungen → Sicherheit ein **App-Passwort** erzeugen
    (nicht dein normales Passwort verwenden!) – das brauchst du gleich in
@@ -107,7 +107,7 @@ sich nicht einfach per Klick installieren. Mögliche Wege:
    und Nextcloud dort selbst installieren – dann greift wieder Bereich A
    mit vollem Zugriff.
 3. **App im offiziellen App Store veröffentlichen**: Für den dauerhaften,
-   breiteren Einsatz könnte man Nextbookmark bei
+   breiteren Einsatz könnte man NEXTBookmarks bei
    [apps.nextcloud.com](https://apps.nextcloud.com) einreichen (inkl.
    Code-Signierung und Review durch Nextcloud). Das lohnt sich erst, wenn
    die App über das Testen hinaus stabil laufen soll – ein Schritt, den wir
@@ -135,10 +135,10 @@ installiert (Windows, Mac oder Linux).
 2. Im Browser `http://localhost:8080` öffnen und ein Admin-Konto anlegen.
 3. Die App in den Container kopieren und aktivieren:
    ```
-   docker cp nextcloud-app nextcloud-test:/var/www/html/apps/nextbookmark
-   docker exec -u www-data nextcloud-test php occ app:enable nextbookmark
+   docker cp nextcloud-app nextcloud-test:/var/www/html/apps/nextbookmarks
+   docker exec -u www-data nextcloud-test php occ app:enable nextbookmarks
    ```
-   (Falls `chown`-Fehler auftreten: `docker exec nextcloud-test chown -R www-data:www-data /var/www/html/apps/nextbookmark`)
+   (Falls `chown`-Fehler auftreten: `docker exec nextcloud-test chown -R www-data:www-data /var/www/html/apps/nextbookmarks`)
 4. Unter `http://localhost:8080` → Einstellungen → Sicherheit ein
    App-Passwort erzeugen.
 5. In der Browser-Extension als Nextcloud-URL `http://localhost:8080`
@@ -204,7 +204,7 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
 - **Icon**: `browser-extension/icons/` enthält ein blaues Icon in 16/48/128px
   (Lesezeichen-Form mit Sync-Pfeilen), erzeugt aus `icon-source.svg`.
   Dasselbe Icon liegt auch unter `nextcloud-app/img/` für die Web-Oberfläche.
-- **Web-Oberfläche** (innerhalb von Nextcloud, Menüpunkt "Nextbookmark"):
+- **Web-Oberfläche** (innerhalb von Nextcloud, Menüpunkt "NEXTBookmarks"):
   Lesezeichen werden nach Ordner gruppiert dargestellt; ein Klick auf
   einen Ordner klappt Titel (fett) und URL (klickbar, öffnet in neuem
   Tab) der enthaltenen Lesezeichen auf. Ordner erscheinen in derselben
@@ -219,15 +219,15 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 
 1. Geänderte Datei in den laufenden Container kopieren, z.B.:
    ```
-   docker cp nextcloud-app/js/app.js nextcloud-test:/var/www/html/apps/nextbookmark/js/app.js
-   docker exec nextcloud-test chown www-data:www-data /var/www/html/apps/nextbookmark/js/app.js
+   docker cp nextcloud-app/js/app.js nextcloud-test:/var/www/html/apps/nextbookmarks/js/app.js
+   docker exec nextcloud-test chown www-data:www-data /var/www/html/apps/nextbookmarks/js/app.js
    ```
 2. **Nur bei Änderungen an einer Migration** (neue/geänderte Spalte in
    `lib/Migration/`) zusätzlich die App einmal deaktivieren/aktivieren,
    damit die Migration ausgeführt wird:
    ```
-   docker exec -u www-data nextcloud-test php occ app:disable nextbookmark
-   docker exec -u www-data nextcloud-test php occ app:enable nextbookmark
+   docker exec -u www-data nextcloud-test php occ app:disable nextbookmarks
+   docker exec -u www-data nextcloud-test php occ app:enable nextbookmarks
    ```
 3. **Browser-Cache beachten**: Nextcloud liefert `js/app.js` und
    `css/style.css` mit einem sehr langen `Cache-Control`-Header aus
@@ -237,7 +237,7 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
    die neue Version längst ausliefert.
 4. Änderungen an `browser-extension/*.js` betreffen nicht den
    Nextcloud-Container, sondern die geladene Erweiterung selbst: in
-   `chrome://extensions` bzw. `vivaldi://extensions` bei Nextbookmark
+   `chrome://extensions` bzw. `vivaldi://extensions` bei NEXTBookmarks
    auf den Reload-Pfeil (⟳) klicken.
 
 ## Bekannte Grenzen / mögliche nächste Schritte
@@ -257,5 +257,5 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 ## Bugs melden
 
 Die `<bugs>`-Adresse in `nextcloud-app/appinfo/info.xml` zeigt auf
-[github.com/Stephan-Lefty/nextbookmark/issues](https://github.com/Stephan-Lefty/nextbookmark/issues) -
+[github.com/Stephan-Lefty/nextbookmarks/issues](https://github.com/Stephan-Lefty/nextbookmarks/issues) -
 dort können Fehler und Ideen für nächste Schritte eingetragen werden.

@@ -1,5 +1,5 @@
 <?php
-namespace OCA\Nextbookmark\Db;
+namespace OCA\Nextbookmarks\Db;
 
 use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
@@ -10,7 +10,7 @@ use OCP\IDBConnection;
  */
 class BookmarkMapper extends QBMapper {
     public function __construct(IDBConnection $db) {
-        parent::__construct($db, 'nextbookmark_bookmarks', Bookmark::class);
+        parent::__construct($db, 'nextbookmarks_bookmarks', Bookmark::class);
     }
 
     // Alle Lesezeichen eines Nutzers
