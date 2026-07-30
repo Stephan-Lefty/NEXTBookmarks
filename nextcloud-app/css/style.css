@@ -1,7 +1,43 @@
 #nextbookmark-app {
     padding: 20px;
+    box-sizing: border-box;
+    height: 100%;
+    overflow-y: auto;
 }
 
-#bookmark-list li {
+#bookmark-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.folder-header {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-border, #ddd);
+    font-weight: bold;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.folder-bookmarks {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0 8px 16px;
+}
+
+.folder-bookmarks li {
     padding: 4px 0;
+}
+
+.folder-bookmarks a {
+    color: var(--color-main-text, #222);
+}
+
+.folder-bookmarks a:hover {
+    color: var(--color-primary-element, #0082c9);
 }

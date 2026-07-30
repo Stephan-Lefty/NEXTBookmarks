@@ -34,12 +34,13 @@ class BookmarkController extends ApiController {
     }
 
     // POST /api/bookmarks -> neues Lesezeichen anlegen
-    public function create(string $url, ?string $title = null, ?string $folder = null): DataResponse {
+    public function create(string $url, ?string $title = null, ?string $folder = null, ?int $position = null): DataResponse {
         $bookmark = new Bookmark();
         $bookmark->setUserId($this->userId);
         $bookmark->setUrl($url);
         $bookmark->setTitle($title ?? '');
         $bookmark->setFolder($folder ?? '');
+        $bookmark->setPosition($position ?? 0);
         $bookmark->setUpdatedAt(time());
 
         $saved = $this->mapper->insert($bookmark);
@@ -47,7 +48,7 @@ class BookmarkController extends ApiController {
     }
 
     // PUT /api/bookmarks/{id} -> vorhandenes Lesezeichen aktualisieren
-    public function update(int $id, ?string $url = null, ?string $title = null, ?string $folder = null): DataResponse {
+    public function update(int $id, ?string $url = null, ?string $title = null, ?string $folder = null, ?int $position = null): DataResponse {
         try {
             $bookmark = $this->mapper->findForUser($id, $this->userId);
         } catch (DoesNotExistException $e) {
@@ -57,6 +58,7 @@ class BookmarkController extends ApiController {
         if ($url !== null) $bookmark->setUrl($url);
         if ($title !== null) $bookmark->setTitle($title);
         if ($folder !== null) $bookmark->setFolder($folder);
+        if ($position !== null) $bookmark->setPosition($position);
         $bookmark->setUpdatedAt(time());
 
         $saved = $this->mapper->update($bookmark);

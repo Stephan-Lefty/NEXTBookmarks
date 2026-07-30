@@ -8,12 +8,17 @@ importScripts('browser-polyfill-shim.js');
 // mit einem einfachen Prinzip:
 //
 //   Wir merken uns nach jedem Sync den "letzten bekannten Stand" pro
-//   Lesezeichen (URL, Titel, Ordner, Zeitstempel) in `syncState`
-//   (gespeichert in browser.storage.local). Beim nächsten Sync
-//   vergleichen wir: aktueller lokaler Stand vs. syncState vs.
-//   aktueller Stand auf dem Server. Daraus ergibt sich, was sich
-//   geändert hat und wer "gewinnt", falls beide Seiten etwas geändert
-//   haben (Konflikt).
+//   Lesezeichen (URL, Titel, Ordner, Position, Zeitstempel) in `syncState`
+//   (gespeichert in browser.storage.local), indiziert über die stabile
+//   lokale Browser-ID des Lesezeichens (NICHT die URL - dieselbe URL
+//   kann mehrfach vorkommen, z.B. dasselbe Lesezeichen in zwei
+//   verschiedenen Ordnern, oder zwei Einträge mit identischer Adresse
+//   im selben Ordner. Über die URL zu indizieren würde solche Duplikate
+//   stillschweigend zu einem einzigen Eintrag zusammenfallen lassen).
+//   Beim nächsten Sync vergleichen wir: aktueller lokaler Stand vs.
+//   syncState vs. aktueller Stand auf dem Server. Daraus ergibt sich,
+//   was sich geändert hat und wer "gewinnt", falls beide Seiten etwas
+//   geändert haben (Konflikt).
 //
 // EINSCHRÄNKUNG (bewusst, für Anfänger transparent gemacht):
 // Browser bieten keine zuverlässige, einheitliche "zuletzt geändert"-
@@ -74,9 +79,13 @@ const deleteRemoteBookmark = (settings, id) =>
 
 // Baut aus dem Lesezeichen-Baum eine flache Liste, inkl. Ordner-Pfad
 // (z.B. "Lesezeichenleiste/Arbeit") und der internen Browser-ID.
+// "position" ist ein fortlaufender Zähler in der Reihenfolge, in der der
+// Baum durchlaufen wird - das entspricht der tatsächlichen Anzeige-
+// Reihenfolge im Browser (Ordner für Ordner, von oben nach unten).
 async function getLocalBookmarksFlat() {
     const tree = await browser.bookmarks.getTree();
     const flat = [];
+    let position = 0;
 
     function walk(nodes, pathParts) {
         for (const node of nodes) {
@@ -86,6 +95,7 @@ async function getLocalBookmarksFlat() {
                     url: node.url,
                     title: node.title || node.url,
                     folder: pathParts.join('/'),
+                    position: position++,
                 });
             } else if (node.children) {
                 const nextPath = node.title ? [...pathParts, node.title] : pathParts;
@@ -141,7 +151,7 @@ async function createLocalBookmark({ url, title, folder }) {
     return browser.bookmarks.create({ parentId, title, url });
 }
 
-// ---- Sync-Status (letzter bekannter Stand pro URL) --------------------
+// ---- Sync-Status (letzter bekannter Stand pro lokaler Browser-ID) -----
 
 async function loadSyncState() {
     const { syncState } = await browser.storage.local.get(['syncState']);
@@ -169,85 +179,117 @@ async function syncBookmarks() {
     const skipSet = new Set(skippedUrls || []);
     const localList = localListRaw.filter(b => !skipSet.has(b.url));
 
-    const remoteByUrl = new Map(remoteList.map(b => [b.url, b]));
-    const localByUrl = new Map(localList.map(b => [b.url, b]));
+    const remoteById = new Map(remoteList.map(b => [String(b.id), b]));
     const newSyncState = {};
-
-    const allUrls = new Set([
-        ...remoteByUrl.keys(),
-        ...localByUrl.keys(),
-        ...Object.keys(syncState),
-    ]);
+    // Merkt sich, welche Remote-IDs bereits einem lokalen Lesezeichen
+    // zugeordnet wurden, damit Schritt 2 sie nicht nochmal anfasst.
+    const handledRemoteIds = new Set();
 
     let created = 0, updated = 0, deleted = 0, conflicts = 0;
 
-    for (const url of allUrls) {
-        const remote = remoteByUrl.get(url);
-        const local = localByUrl.get(url);
-        const known = syncState[url];
+    // 1) Alle lokalen Lesezeichen anhand ihrer stabilen Browser-ID abgleichen.
+    for (const local of localList) {
+        let known = syncState[local.localId];
+        let remote = known ? remoteById.get(String(known.remoteId)) : undefined;
 
-        if (!remote && !local) {
-            continue; // war bekannt, existiert jetzt nirgends mehr -> nichts zu tun
-        }
-
-        if (local && !remote && !known) {
-            // neu, nur lokal vorhanden -> hochladen
-            const saved = await createRemoteBookmark(settings, {
-                url: local.url, title: local.title, folder: local.folder,
-            });
-            newSyncState[url] = { remoteId: saved.id, title: local.title, folder: local.folder, updatedAt: saved.updatedAt };
-            created++;
-            continue;
-        }
-
-        if (remote && !local && !known) {
-            // neu, nur remote vorhanden -> lokal anlegen
-            await createLocalBookmark({ url: remote.url, title: remote.title, folder: remote.folder });
-            newSyncState[url] = { remoteId: remote.id, title: remote.title, folder: remote.folder, updatedAt: remote.updatedAt };
-            created++;
-            continue;
-        }
-
-        if (known && !local && remote) {
-            // war bekannt, lokal gelöscht -> auch remote löschen
-            await deleteRemoteBookmark(settings, remote.id);
-            deleted++;
-            continue;
-        }
-
-        if (known && !remote && local) {
-            // war bekannt, remote gelöscht -> auch lokal löschen
+        if (known && !remote) {
+            // War bekannt, remote aber verschwunden -> auch lokal löschen
             await browser.bookmarks.remove(local.localId);
             deleted++;
             continue;
         }
 
-        if (local && remote && known) {
-            const localChanged = local.title !== known.title || local.folder !== known.folder;
-            const remoteChanged = remote.updatedAt !== known.updatedAt;
+        if (!known) {
+            // Kein bekannter Verweis unter der Browser-ID. Das ist entweder
+            // wirklich neu, oder ein Lesezeichen aus der Zeit, als der Sync
+            // noch über die URL statt über die Browser-ID verknüpft hat
+            // (siehe Kommentar oben). Erst prüfen, ob es dafür schon ein
+            // noch nicht verknüpftes Remote-Lesezeichen mit exakt gleicher
+            // URL+Ordner gibt und dieses übernehmen - sonst würde bei
+            // jedem Nutzer mit altem Sync-Stand nach diesem Update alles
+            // dupliziert.
+            remote = remoteList.find(r =>
+                r.url === local.url && r.folder === local.folder && !handledRemoteIds.has(String(r.id))
+            );
 
-            if (localChanged && remoteChanged) {
-                conflicts++;
-                if (remote.updatedAt > known.updatedAt) {
-                    await browser.bookmarks.update(local.localId, { title: remote.title, url: remote.url });
-                    newSyncState[url] = { remoteId: remote.id, title: remote.title, folder: remote.folder, updatedAt: remote.updatedAt };
-                } else {
-                    const saved = await updateRemoteBookmark(settings, remote.id, { title: local.title, folder: local.folder });
-                    newSyncState[url] = { remoteId: remote.id, title: local.title, folder: local.folder, updatedAt: saved.updatedAt };
-                }
-                updated++;
-            } else if (localChanged) {
-                const saved = await updateRemoteBookmark(settings, remote.id, { title: local.title, folder: local.folder });
-                newSyncState[url] = { remoteId: remote.id, title: local.title, folder: local.folder, updatedAt: saved.updatedAt };
-                updated++;
-            } else if (remoteChanged) {
-                await browser.bookmarks.update(local.localId, { title: remote.title });
-                newSyncState[url] = { remoteId: remote.id, title: remote.title, folder: remote.folder, updatedAt: remote.updatedAt };
-                updated++;
-            } else {
-                newSyncState[url] = known;
+            if (!remote) {
+                const saved = await createRemoteBookmark(settings, {
+                    url: local.url, title: local.title, folder: local.folder, position: local.position,
+                });
+                newSyncState[local.localId] = {
+                    remoteId: saved.id, url: local.url, title: local.title,
+                    folder: local.folder, position: local.position, updatedAt: saved.updatedAt,
+                };
+                handledRemoteIds.add(String(saved.id));
+                created++;
+                continue;
             }
         }
+        handledRemoteIds.add(String(remote.id));
+
+        const localChanged = !known || local.url !== known.url || local.title !== known.title
+            || local.folder !== known.folder || local.position !== known.position;
+        const remoteChanged = known ? remote.updatedAt !== known.updatedAt : false;
+
+        if (localChanged && remoteChanged) {
+            conflicts++;
+            if (remote.updatedAt > known.updatedAt) {
+                await browser.bookmarks.update(local.localId, { title: remote.title, url: remote.url });
+                newSyncState[local.localId] = {
+                    remoteId: remote.id, url: remote.url, title: remote.title,
+                    folder: remote.folder, position: remote.position, updatedAt: remote.updatedAt,
+                };
+            } else {
+                const saved = await updateRemoteBookmark(settings, remote.id, {
+                    url: local.url, title: local.title, folder: local.folder, position: local.position,
+                });
+                newSyncState[local.localId] = {
+                    remoteId: remote.id, url: local.url, title: local.title,
+                    folder: local.folder, position: local.position, updatedAt: saved.updatedAt,
+                };
+            }
+            updated++;
+        } else if (localChanged) {
+            const saved = await updateRemoteBookmark(settings, remote.id, {
+                url: local.url, title: local.title, folder: local.folder, position: local.position,
+            });
+            newSyncState[local.localId] = {
+                remoteId: remote.id, url: local.url, title: local.title,
+                folder: local.folder, position: local.position, updatedAt: saved.updatedAt,
+            };
+            updated++;
+        } else if (remoteChanged) {
+            await browser.bookmarks.update(local.localId, { title: remote.title, url: remote.url });
+            newSyncState[local.localId] = {
+                remoteId: remote.id, url: remote.url, title: remote.title,
+                folder: remote.folder, position: remote.position, updatedAt: remote.updatedAt,
+            };
+            updated++;
+        } else {
+            newSyncState[local.localId] = known;
+        }
+    }
+
+    // 2) Übrige Remote-Lesezeichen: entweder komplett neu (lokal anlegen)
+    // oder ihr lokales Gegenstück wurde inzwischen gelöscht (remote auch
+    // löschen).
+    for (const remote of remoteList) {
+        const remoteIdStr = String(remote.id);
+        if (handledRemoteIds.has(remoteIdStr)) continue;
+
+        const wasKnown = Object.values(syncState).some(s => String(s.remoteId) === remoteIdStr);
+        if (wasKnown) {
+            await deleteRemoteBookmark(settings, remote.id);
+            deleted++;
+            continue;
+        }
+
+        const createdLocal = await createLocalBookmark({ url: remote.url, title: remote.title, folder: remote.folder });
+        newSyncState[createdLocal.id] = {
+            remoteId: remote.id, url: remote.url, title: remote.title,
+            folder: remote.folder, position: remote.position, updatedAt: remote.updatedAt,
+        };
+        created++;
     }
 
     await saveSyncState(newSyncState);

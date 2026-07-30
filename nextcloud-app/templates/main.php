@@ -5,5 +5,5 @@
 ?>
 <div id="nextbookmark-app">
     <h2>Meine Lesezeichen</h2>
-    <ul id="bookmark-list"><!-- wird per JS gefüllt --></ul>
+    <ul id="bookmark-list"><!-- wird per JS gefüllt: Ordner, aufklappbar --></ul>
 </div>
