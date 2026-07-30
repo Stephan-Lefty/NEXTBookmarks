@@ -34,6 +34,24 @@
     "optionsConnectionHeading": {
         "message": "Nextcloud connection"
     },
+    "optionsSyncModeLabel": {
+        "message": "Connection type:"
+    },
+    "optionsSyncModeRest": {
+        "message": "Nextcloud app (App Store)"
+    },
+    "optionsSyncModeWebdav": {
+        "message": "WebDAV folder (no server app)"
+    },
+    "optionsSyncModeRestHint": {
+        "message": "Uses the NEXTBookmarks app installed on the server. Needed if you want fine-grained sync and an overview page inside Nextcloud."
+    },
+    "optionsSyncModeWebdavHint": {
+        "message": "Stores all bookmarks as a single file in the \"NEXTBookmarks\" folder in your Nextcloud files. Works on any Nextcloud, even without installed apps (e.g. on restricted hosting plans) - no overview page inside Nextcloud."
+    },
+    "errorWebdavConflict": {
+        "message": "Another device just changed the bookmarks file at the same time. Please sync again shortly."
+    },
     "optionsServerUrlLabel": {
         "message": "Nextcloud URL:"
     },

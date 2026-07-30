@@ -37,13 +37,13 @@ const SYNC_INTERVAL_MINUTES = 15;
 // ---- Einstellungen & HTTP-Hilfsfunktionen -----------------------------
 
 async function getSettings() {
-    const { serverUrl, username, appPassword } = await browser.storage.sync.get([
-        'serverUrl', 'username', 'appPassword'
+    const { serverUrl, username, appPassword, syncMode } = await browser.storage.sync.get([
+        'serverUrl', 'username', 'appPassword', 'syncMode'
     ]);
     if (!serverUrl || !username || !appPassword) {
         throw new Error(chrome.i18n.getMessage('errorMissingCredentials'));
     }
-    return { serverUrl, username, appPassword };
+    return { serverUrl, username, appPassword, syncMode: syncMode || 'rest' };
 }
 
 function authHeader(username, appPassword) {
@@ -67,13 +67,144 @@ async function apiRequest(settings, path, options = {}) {
     return response.json();
 }
 
-const fetchRemoteBookmarks = (settings) => apiRequest(settings, '/bookmarks');
-const createRemoteBookmark = (settings, data) =>
-    apiRequest(settings, '/bookmarks', { method: 'POST', body: JSON.stringify(data) });
-const updateRemoteBookmark = (settings, id, data) =>
-    apiRequest(settings, `/bookmarks/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-const deleteRemoteBookmark = (settings, id) =>
-    apiRequest(settings, `/bookmarks/${id}`, { method: 'DELETE' });
+// ---- Backend "Nextcloud-App": REST-API der eigenen Server-App ---------
+
+const restBackend = {
+    fetchRemoteBookmarks: (settings) => apiRequest(settings, '/bookmarks'),
+    createRemoteBookmark: (settings, data) =>
+        apiRequest(settings, '/bookmarks', { method: 'POST', body: JSON.stringify(data) }),
+    updateRemoteBookmark: (settings, id, data) =>
+        apiRequest(settings, `/bookmarks/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteRemoteBookmark: (settings, id) =>
+        apiRequest(settings, `/bookmarks/${id}`, { method: 'DELETE' }),
+    // Jede REST-Anfrage speichert sofort - hier gibt es nichts nachzuholen.
+    async commit() {},
+};
+
+// ---- Backend "WebDAV-Ordner": kein Server-App nötig --------------------
+//
+// Funktioniert auf jeder Nextcloud, auch bei eingeschränkten Hosting-
+// Paketen ohne eigene Apps (z.B. Hetzner Storage Share), weil WebDAV zur
+// Grundausstattung jeder Nextcloud gehört. Alle Lesezeichen liegen dabei
+// als eine einzige JSON-Datei im Ordner "NEXTBookmarks" im Dateien-
+// Bereich des Nutzers. Ein Sync lädt die Datei einmal komplett, sammelt
+// alle Änderungen im Speicher und schreibt am Ende einmal die
+// aktualisierte Datei zurück. Der zuletzt gelesene ETag wird dabei als
+// "If-Match"-Bedingung mitgeschickt: Hat ein anderes Gerät die Datei
+// zwischenzeitlich geändert, schlägt das Schreiben ab, statt die fremde
+// Änderung stillschweigend zu überschreiben.
+
+const WEBDAV_FOLDER = 'NEXTBookmarks';
+const WEBDAV_FILE = `${WEBDAV_FOLDER}/bookmarks.json`;
+
+function webdavUrl(settings, path) {
+    return `${settings.serverUrl}/remote.php/dav/files/${encodeURIComponent(settings.username)}/${path}`;
+}
+
+async function webdavRequest(settings, path, options = {}) {
+    return fetch(webdavUrl(settings, path), {
+        ...options,
+        headers: {
+            'Authorization': authHeader(settings.username, settings.appPassword),
+            ...options.headers,
+        },
+    });
+}
+
+async function webdavEnsureFolder(settings) {
+    const response = await webdavRequest(settings, WEBDAV_FOLDER, { method: 'MKCOL' });
+    // 201 = neu angelegt, 405 = existiert schon - beides in Ordnung.
+    if (!response.ok && response.status !== 405) {
+        throw new Error(chrome.i18n.getMessage('errorServerResponse', [String(response.status), WEBDAV_FOLDER]));
+    }
+}
+
+// Lädt die Lesezeichen-Datei höchstens einmal pro Sync-Lauf und merkt
+// sich das Ergebnis direkt am settings-Objekt, damit create/update/delete
+// danach mit demselben Stand weiterarbeiten.
+async function webdavLoad(settings) {
+    if (settings._webdav) return settings._webdav;
+
+    await webdavEnsureFolder(settings);
+    const response = await webdavRequest(settings, WEBDAV_FILE);
+
+    if (response.status === 404) {
+        settings._webdav = { items: [], etag: null, dirty: false };
+    } else if (response.ok) {
+        settings._webdav = { items: await response.json(), etag: response.headers.get('ETag'), dirty: false };
+    } else {
+        throw new Error(chrome.i18n.getMessage('errorServerResponse', [String(response.status), WEBDAV_FILE]));
+    }
+    return settings._webdav;
+}
+
+async function webdavFetchRemoteBookmarks(settings) {
+    return (await webdavLoad(settings)).items;
+}
+
+async function webdavCreateRemoteBookmark(settings, data) {
+    const state = await webdavLoad(settings);
+    const item = {
+        id: crypto.randomUUID(),
+        url: data.url, title: data.title, folder: data.folder, position: data.position,
+        updatedAt: Math.floor(Date.now() / 1000),
+    };
+    state.items.push(item);
+    state.dirty = true;
+    return item;
+}
+
+async function webdavUpdateRemoteBookmark(settings, id, data) {
+    const state = await webdavLoad(settings);
+    const item = state.items.find(i => String(i.id) === String(id));
+    if (!item) throw new Error(chrome.i18n.getMessage('errorServerResponse', ['404', WEBDAV_FILE]));
+    Object.assign(item, data, { updatedAt: Math.floor(Date.now() / 1000) });
+    state.dirty = true;
+    return item;
+}
+
+async function webdavDeleteRemoteBookmark(settings, id) {
+    const state = await webdavLoad(settings);
+    state.items = state.items.filter(i => String(i.id) !== String(id));
+    state.dirty = true;
+}
+
+async function webdavCommit(settings) {
+    const state = settings._webdav;
+    if (!state || !state.dirty) return; // nichts geändert -> nichts zu schreiben
+
+    const headers = { 'Content-Type': 'application/json' };
+    // Schreibschutz gegen gleichzeitige Änderungen von einem anderen
+    // Gerät: Existiert die Datei schon, muss ihr ETag noch stimmen;
+    // existiert sie noch nicht, darf sie das auch beim Schreiben nicht.
+    if (state.etag) headers['If-Match'] = state.etag;
+    else headers['If-None-Match'] = '*';
+
+    const response = await webdavRequest(settings, WEBDAV_FILE, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(state.items),
+    });
+
+    if (!response.ok) {
+        if (response.status === 412) {
+            throw new Error(chrome.i18n.getMessage('errorWebdavConflict'));
+        }
+        throw new Error(chrome.i18n.getMessage('errorServerResponse', [String(response.status), WEBDAV_FILE]));
+    }
+}
+
+const webdavBackend = {
+    fetchRemoteBookmarks: webdavFetchRemoteBookmarks,
+    createRemoteBookmark: webdavCreateRemoteBookmark,
+    updateRemoteBookmark: webdavUpdateRemoteBookmark,
+    deleteRemoteBookmark: webdavDeleteRemoteBookmark,
+    commit: webdavCommit,
+};
+
+function getBackend(settings) {
+    return settings.syncMode === 'webdav' ? webdavBackend : restBackend;
+}
 
 // ---- Lokale Lesezeichen lesen & schreiben (inkl. Ordner-Pfad) --------
 
@@ -166,8 +297,9 @@ async function saveSyncState(state) {
 
 async function syncBookmarks() {
     const settings = await getSettings();
+    const backend = getBackend(settings);
     const [remoteList, localListRaw, syncState, { skippedUrls }] = await Promise.all([
-        fetchRemoteBookmarks(settings),
+        backend.fetchRemoteBookmarks(settings),
         getLocalBookmarksFlat(),
         loadSyncState(),
         browser.storage.local.get(['skippedUrls']),
@@ -213,7 +345,7 @@ async function syncBookmarks() {
             );
 
             if (!remote) {
-                const saved = await createRemoteBookmark(settings, {
+                const saved = await backend.createRemoteBookmark(settings, {
                     url: local.url, title: local.title, folder: local.folder, position: local.position,
                 });
                 newSyncState[local.localId] = {
@@ -240,7 +372,7 @@ async function syncBookmarks() {
                     folder: remote.folder, position: remote.position, updatedAt: remote.updatedAt,
                 };
             } else {
-                const saved = await updateRemoteBookmark(settings, remote.id, {
+                const saved = await backend.updateRemoteBookmark(settings, remote.id, {
                     url: local.url, title: local.title, folder: local.folder, position: local.position,
                 });
                 newSyncState[local.localId] = {
@@ -250,7 +382,7 @@ async function syncBookmarks() {
             }
             updated++;
         } else if (localChanged) {
-            const saved = await updateRemoteBookmark(settings, remote.id, {
+            const saved = await backend.updateRemoteBookmark(settings, remote.id, {
                 url: local.url, title: local.title, folder: local.folder, position: local.position,
             });
             newSyncState[local.localId] = {
@@ -279,7 +411,7 @@ async function syncBookmarks() {
 
         const wasKnown = Object.values(syncState).some(s => String(s.remoteId) === remoteIdStr);
         if (wasKnown) {
-            await deleteRemoteBookmark(settings, remote.id);
+            await backend.deleteRemoteBookmark(settings, remote.id);
             deleted++;
             continue;
         }
@@ -292,6 +424,7 @@ async function syncBookmarks() {
         created++;
     }
 
+    await backend.commit(settings);
     await saveSyncState(newSyncState);
     return { success: true, created, updated, deleted, conflicts };
 }

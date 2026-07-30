@@ -3,6 +3,13 @@
 <head><meta charset="UTF-8"><title data-i18n="optionsPageTitle">NEXTBookmarks</title></head>
 <body>
     <h3 data-i18n="optionsConnectionHeading"></h3>
+    <label><span data-i18n="optionsSyncModeLabel"></span>
+        <select id="syncMode">
+            <option value="rest" data-i18n="optionsSyncModeRest"></option>
+            <option value="webdav" data-i18n="optionsSyncModeWebdav"></option>
+        </select>
+    </label><br>
+    <p id="syncModeHint" data-i18n="optionsSyncModeRestHint"></p>
     <label><span data-i18n="optionsServerUrlLabel"></span> <input id="serverUrl" placeholder="https://meine-cloud.example.com"></label><br>
     <label><span data-i18n="optionsUsernameLabel"></span> <input id="username"></label><br>
     <label><span data-i18n="optionsAppPasswordLabel"></span> <input id="appPassword" type="password"></label><br>
