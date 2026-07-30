@@ -5,6 +5,9 @@
     "popupSyncButton": {
         "message": "Jetzt synchronisieren"
     },
+    "popupSettingsButton": {
+        "message": "Einstellungen"
+    },
     "popupStatusReady": {
         "message": "Bereit."
     },
@@ -33,6 +36,24 @@
     },
     "optionsConnectionHeading": {
         "message": "Nextcloud-Verbindung"
+    },
+    "optionsSyncModeLabel": {
+        "message": "Verbindungsart:"
+    },
+    "optionsSyncModeRest": {
+        "message": "Nextcloud-App (App Store)"
+    },
+    "optionsSyncModeWebdav": {
+        "message": "WebDAV-Ordner (ohne Server-App)"
+    },
+    "optionsSyncModeRestHint": {
+        "message": "Nutzt die installierte NEXTBookmarks-App auf dem Server. Nötig, wenn du eine eigene, feingranulare Synchronisation und die Übersicht innerhalb von Nextcloud willst."
+    },
+    "optionsSyncModeWebdavHint": {
+        "message": "Speichert alle Lesezeichen als eine Datei im Ordner \"NEXTBookmarks\" in deinen Nextcloud-Dateien. Funktioniert auf jeder Nextcloud, auch ohne installierte Apps (z.B. bei eingeschränkten Hosting-Paketen) - keine Übersicht innerhalb von Nextcloud."
+    },
+    "errorWebdavConflict": {
+        "message": "Ein anderes Gerät hat die Lesezeichen-Datei gerade gleichzeitig geändert. Bitte in Kürze erneut synchronisieren."
     },
     "optionsServerUrlLabel": {
         "message": "Nextcloud-URL:"
