@@ -6,6 +6,6 @@ document.getElementById('syncNow').addEventListener('click', async () => {
     const result = await chrome.runtime.sendMessage({ action: 'sync' });
 
     statusEl.textContent = result?.success
-        ? `Fertig (${result.count} Lesezeichen).`
+        ? `Fertig (${result.created} neu, ${result.updated} aktualisiert, ${result.deleted} gelöscht).`
         : `Fehler: ${result?.error || 'unbekannt'}`;
 });
