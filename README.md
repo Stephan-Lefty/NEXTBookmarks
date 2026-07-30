@@ -3,6 +3,8 @@
 Ein Tool, das Browser-Lesezeichen zentral über eine selbst gehostete Nextcloud
 synchron hält – unabhängig von Browser und Betriebssystem.
 
+Dieses Projekt ist in Zusammenarbeit mit [Claude](https://claude.com) entstanden.
+
 ## Wie die beiden Teile zusammenspielen
 
 ```
@@ -166,6 +168,18 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
   zuverlässige "zuletzt geändert"-Zeit liefern, ist das eine pragmatische
   Näherung – für den Alltag reicht sie, für einen produktiven Einsatz wäre
   ein sauberer, revisionierter Abgleich der nächste Ausbauschritt.
+- **Kein zentraler "Master"**: Nextcloud ist kein bevorzugter Master, dem
+  der Browser blind folgt, sondern die gemeinsame Ablage, über die sich
+  mehrere Geräte gegenseitig abgleichen – Änderungen laufen in beide
+  Richtungen, entschieden wird pro Lesezeichen (siehe Konfliktlösung
+  oben). Möglich wird das, weil der Abgleich nicht nur "lokal vs. Server"
+  vergleicht, sondern zusätzlich den *letzten bekannten Stand* aus dem
+  vorherigen Sync mit einbezieht (`syncState`, siehe Kommentar am Anfang
+  von `background.js`). Richtest du die Extension auf einem neuen/leeren
+  Gerät ein, ist für dieses Gerät (dessen `syncState` ja leer ist) jedes
+  Cloud-Lesezeichen "neu, nie gesehen" → es wird heruntergeladen, nicht
+  gelöscht. Gelöscht wird nur, wenn ein Gerät sich aktiv erinnert "das
+  kannte ich früher lokal, jetzt ist es weg".
 - **Ordnerstruktur**: Der Ordnerpfad (z.B. `Lesezeichenleiste/Arbeit`) wird
   mit übertragen; beim Herunterladen werden fehlende Ordner lokal automatisch
   angelegt.
@@ -195,9 +209,12 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
 
 - Konfliktlösung basiert auf einer Vereinfachung (siehe oben) statt echter
   Versionierung.
-- Der Sync-Zustand liegt lokal je Browser-Profil (`browser.storage.local`);
-  bei einer Neuinstallation der Extension wird beim ersten Sync alles neu
-  abgeglichen (unkritisch, aber gut zu wissen).
+- Der Sync-Zustand liegt lokal je Browser-Profil (`browser.storage.local`),
+  indiziert über die stabile lokale Browser-ID jedes Lesezeichens (nicht
+  die URL, da dieselbe Adresse mehrfach vorkommen kann). Bei einer
+  Neuinstallation der Extension ist dieser Zustand leer; der erste Sync
+  danach erkennt bereits vorhandene Cloud-Lesezeichen anhand von
+  URL+Ordner automatisch wieder, statt sie zu duplizieren.
 - Für sehr viele Lesezeichen (mehrere Tausend) wäre eine effizientere,
   inkrementelle API (z.B. "nur Änderungen seit Zeitpunkt X") sinnvoll statt
   jedes Mal die komplette Liste zu laden.
