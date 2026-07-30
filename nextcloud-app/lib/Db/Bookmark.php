@@ -19,7 +19,7 @@ use OCP\AppFramework\Db\Entity;
  * @method int getUpdatedAt()
  * @method void setUpdatedAt(int $updatedAt)
  */
-class Bookmark extends Entity {
+class Bookmark extends Entity implements \JsonSerializable {
     protected $userId;
     protected $url;
     protected $title;
@@ -31,5 +31,18 @@ class Bookmark extends Entity {
         // aus/in die Datenbank konvertiert.
         $this->addType('id', 'integer');
         $this->addType('updatedAt', 'integer');
+    }
+
+    // Entity implementiert JsonSerializable nicht selbst und serialisiert
+    // ohne dies nur die public-Property "id" - die Browser-Extension
+    // braucht aber url/title/folder/updatedAt aus der API-Antwort.
+    public function jsonSerialize(): array {
+        return [
+            'id' => $this->id,
+            'url' => $this->url,
+            'title' => $this->title,
+            'folder' => $this->folder,
+            'updatedAt' => $this->updatedAt,
+        ];
     }
 }
