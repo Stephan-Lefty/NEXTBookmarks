@@ -38,8 +38,11 @@ document.getElementById('importSkipped').addEventListener('click', async () => {
 
     // Skip-Liste leeren, damit die zuvor übersprungenen Lesezeichen beim
     // nächsten Sync ganz normal wie neue lokale Lesezeichen behandelt
-    // und hochgeladen werden.
-    await chrome.storage.local.remove('skippedUrls');
+    // und hochgeladen werden. Pro Server+Konto getrennt (siehe
+    // background.js/onboarding.js).
+    const serverUrl = document.getElementById('serverUrl').value.replace(/\/$/, '');
+    const username = document.getElementById('username').value;
+    await chrome.storage.local.remove(`skippedUrls::${serverUrl}::${username}`);
     const result = await chrome.runtime.sendMessage({ action: 'sync' });
 
     importStatusEl.textContent = result?.success
