@@ -3,21 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title data-i18n="onboardingPageTitle">NEXTBookmarks</title>
+    <link rel="stylesheet" href="theme.css">
     <style>
-        body { font-family: sans-serif; max-width: 480px; margin: 40px auto; }
-        button { padding: 8px 16px; margin-right: 8px; }
+        body { max-width: 440px; margin: 40px auto; padding: 0 20px; }
+        .card p { margin: 10px 0 0; }
     </style>
 </head>
 <body>
-    <h2 data-i18n="onboardingHeading"></h2>
-    <p>
-        <span data-i18n="onboardingIntroPrefix"></span>
-        <strong id="count">…</strong>
-        <span data-i18n="onboardingIntroSuffix"></span>
-    </p>
-    <button id="importYes" data-i18n="onboardingImportYesButton"></button>
-    <button id="importNo" data-i18n="onboardingImportNoButton"></button>
-    <p id="status"></p>
+    <div class="card">
+        <p class="title">NEXTBookmarks</p>
+        <div class="notice">
+            <span class="icon">📥</span>
+            <span data-i18n="onboardingHeading"></span>
+        </div>
+        <p>
+            <span data-i18n="onboardingIntroPrefix"></span>
+            <strong id="count">…</strong>
+            <span data-i18n="onboardingIntroSuffix"></span>
+        </p>
+        <div class="actions">
+            <button id="importNo" data-i18n="onboardingImportNoButton"></button>
+            <button id="importYes" class="primary" data-i18n="onboardingImportYesButton"></button>
+        </div>
+        <p id="status" class="status"></p>
+    </div>
     <script src="i18n.js"></script>
     <script src="onboarding.js"></script>
 </body>
