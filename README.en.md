@@ -245,11 +245,23 @@ with your real Hetzner cloud, and you can remove it any time with
   half of the known bookmarks (e.g. because the wrong server/account was
   entered by mistake), it aborts completely instead of carrying out the
   deletion, with an error message prompting you to check your credentials.
-- **Cross-browser compatibility**: `browser-polyfill-shim.js` ensures the
-  same code runs in Chrome/Edge (only `chrome.*` available) and Firefox
-  (native, promise-based `browser.*`). Publishing to the Firefox store
-  would additionally require the regular signing/publishing process; the
-  `gecko.id` in the manifest is already prepared for that.
+- **Cross-browser compatibility**: `browser-polyfill-shim.js` lets the same
+  code consistently use `browser.*` (promises), even in browsers that only
+  offer the older, callback-based `chrome.*`. `manifest.json` deliberately
+  lists both `service_worker` (Chrome/Edge/Vivaldi/Brave/Opera) and
+  `scripts` (needed by Firefox for MV3 background scripts, since Firefox
+  doesn't use a true service worker there) for the background process.
+  - **Chromium-based browsers** (Chrome, Edge, Vivaldi, Brave, Opera):
+    live-tested - the extension loads, the service worker starts, all
+    pages (popup/settings/onboarding) and the bookmark sync message work
+    without errors.
+  - **Firefox**: code has been adapted for Firefox compatibility (see
+    above), but not yet live-tested since no Firefox instance is available
+    in the development environment - feedback after a real test is
+    welcome. Publishing to the Firefox store would additionally require
+    the regular signing/publishing process; the `gecko.id` in the manifest
+    is already prepared for that.
+  - **Safari**: currently not supported - see the note further below.
 - **Onboarding import prompt**: right after installation (or as soon as you
   save the Nextcloud credentials in the settings), `onboarding.html` opens
   automatically asking whether your existing local bookmarks should be
@@ -321,6 +333,19 @@ test instance (see section C above) whether a change works:
   therefore uses `Last-Modified`/`If-Unmodified-Since` instead of
   `ETag`/`If-Match` – functionally equivalent, but with second- rather than
   millisecond-precision.
+- **Safari: currently not supported.** Two separate hurdles:
+  1. *Build/distribution*: Safari extensions can't just be "loaded
+     unpacked" like Chrome/Firefox – they need to be converted into a
+     native macOS/iOS app bundle with Apple's
+     `safari-web-extension-converter` and built/signed via Xcode. That
+     requires a Mac with Xcode; not possible in the current (Linux)
+     development environment.
+  2. *API gap*: as far as is currently known, Safari's WebExtension
+     support doesn't cover the `bookmarks` API that this entire extension
+     is built on. That wouldn't be a small compatibility fix but would
+     require a fundamentally different implementation for Safari (if
+     possible at all). This would need to be verified on a real Mac first
+     before a Safari port could be meaningfully planned.
 
 ## Reporting bugs
 

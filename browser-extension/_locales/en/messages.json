@@ -58,6 +58,9 @@
     "optionsSyncModeWebdavHint": {
         "message": "Stores all bookmarks as a single file in the \"NEXTBookmarks\" folder in your Nextcloud files. Works on any Nextcloud, even without installed apps (e.g. on restricted hosting plans) - no overview page inside Nextcloud."
     },
+    "optionsSyncModeRestWarning": {
+        "message": "Not yet approved as a Nextcloud app in the Store!"
+    },
     "errorWebdavConflict": {
         "message": "Another device just changed the bookmarks file at the same time. Please sync again shortly."
     },

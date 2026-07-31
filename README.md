@@ -258,10 +258,22 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
   die Löschung durchzuführen – mit einer Fehlermeldung, die zur Prüfung der
   Zugangsdaten auffordert.
 - **Cross-Browser-Kompatibilität**: `browser-polyfill-shim.js` sorgt dafür,
-  dass derselbe Code in Chrome/Edge (nur `chrome.*` vorhanden) und Firefox
-  (natives, promise-basiertes `browser.*`) läuft. Für den Firefox-Store wäre
-  zusätzlich die reguläre Signierung/Veröffentlichung nötig; die
-  `gecko.id` im Manifest ist dafür schon vorbereitet.
+  dass derselbe Code einheitlich `browser.*` (Promises) nutzen kann - auch
+  in Browsern, die nur das ältere, callback-basierte `chrome.*` anbieten.
+  `manifest.json` listet für den Hintergrund-Prozess bewusst sowohl
+  `service_worker` (Chrome/Edge/Vivaldi/Brave/Opera) als auch `scripts`
+  (von Firefox für MV3-Hintergrundskripte benötigt, da Firefox dort keinen
+  echten Service Worker nutzt).
+  - **Chromium-basierte Browser** (Chrome, Edge, Vivaldi, Brave, Opera):
+    live getestet - Erweiterung lädt, Service Worker startet, alle Seiten
+    (Popup/Einstellungen/Onboarding) sowie die Lesezeichen-Sync-Nachricht
+    funktionieren fehlerfrei.
+  - **Firefox**: Code auf Firefox-Kompatibilität umgestellt (s.o.), aber
+    mangels Firefox-Instanz in der Entwicklungsumgebung noch nicht live
+    getestet - Rückmeldung nach einem echten Test willkommen. Für den
+    Firefox-Store wäre zusätzlich die reguläre Signierung/Veröffentlichung
+    nötig; die `gecko.id` im Manifest ist dafür schon vorbereitet.
+  - **Safari**: aktuell nicht unterstützt - siehe Hinweis weiter unten.
 - **Onboarding-Import-Abfrage**: Direkt nach der Installation (bzw. sobald
   du die Nextcloud-Zugangsdaten in den Einstellungen gespeichert hast)
   öffnet sich automatisch `onboarding.html` mit der Frage, ob deine
@@ -337,6 +349,20 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
   beim Schreiben nutzt deshalb `Last-Modified`/`If-Unmodified-Since` statt
   `ETag`/`If-Match` – funktional gleichwertig, aber mit Sekunden- statt
   Millisekunden-Genauigkeit.
+- **Safari: aktuell nicht unterstützt.** Zwei getrennte Hürden:
+  1. *Build/Vertrieb*: Safari-Erweiterungen lassen sich nicht wie bei
+     Chrome/Firefox einfach "entpackt laden" – sie müssen mit Apples
+     `safari-web-extension-converter` in ein natives macOS/iOS-App-Bundle
+     umgewandelt und über Xcode gebaut/signiert werden. Das setzt einen
+     Mac mit Xcode voraus; in der aktuellen (Linux-)Entwicklungsumgebung
+     ist das nicht möglich.
+  2. *API-Lücke*: Safaris WebExtension-Unterstützung deckt die
+     `bookmarks`-API – auf der diese gesamte Erweiterung aufbaut – nach
+     aktuellem Kenntnisstand nicht ab. Das wäre kein kleiner Kompatibilitäts-
+     Fix, sondern würde eine grundlegend andere Umsetzung für Safari
+     erfordern (falls überhaupt möglich). Das müsste zuerst mit einem
+     echten Mac verifiziert werden, bevor sich eine Safari-Portierung
+     überhaupt sinnvoll planen lässt.
 
 ## Bugs melden
 

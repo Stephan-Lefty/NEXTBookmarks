@@ -10,6 +10,7 @@ if (typeof browser === 'undefined') {
         bookmarks: {
             getTree: () => new Promise(resolve => chrome.bookmarks.getTree(resolve)),
             getSubTree: (id) => new Promise(resolve => chrome.bookmarks.getSubTree(id, resolve)),
+            getChildren: (id) => new Promise(resolve => chrome.bookmarks.getChildren(id, resolve)),
             search: (query) => new Promise(resolve => chrome.bookmarks.search(query, resolve)),
             create: (details) => new Promise(resolve => chrome.bookmarks.create(details, resolve)),
             update: (id, changes) => new Promise(resolve => chrome.bookmarks.update(id, changes, resolve)),
@@ -28,15 +29,29 @@ if (typeof browser === 'undefined') {
             local: {
                 get: (keys) => new Promise(resolve => chrome.storage.local.get(keys, resolve)),
                 set: (items) => new Promise(resolve => chrome.storage.local.set(items, resolve)),
+                remove: (keys) => new Promise(resolve => chrome.storage.local.remove(keys, resolve)),
             },
         },
         runtime: {
             sendMessage: (...args) => chrome.runtime.sendMessage(...args),
             onMessage: chrome.runtime.onMessage,
+            onInstalled: chrome.runtime.onInstalled,
+            onStartup: chrome.runtime.onStartup,
+            getURL: (path) => chrome.runtime.getURL(path),
         },
         alarms: {
             create: (name, info) => chrome.alarms.create(name, info),
             onAlarm: chrome.alarms.onAlarm,
+        },
+        windows: {
+            create: (details) => new Promise(resolve => chrome.windows.create(details, resolve)),
+            update: (id, info) => new Promise(resolve => chrome.windows.update(id, info, resolve)),
+            getCurrent: () => new Promise(resolve => chrome.windows.getCurrent(resolve)),
+            getAll: (info) => new Promise(resolve => chrome.windows.getAll(info, resolve)),
+            onRemoved: chrome.windows.onRemoved,
+        },
+        tabs: {
+            create: (details) => new Promise(resolve => chrome.tabs.create(details, resolve)),
         },
     };
 }
