@@ -31,9 +31,7 @@ Sync your browser bookmarks with your own Nextcloud – no middleman server, via
 ## Weitere Angaben im Formular
 
 - **Kategorie**: Productivity (Produktivität)
-- **Lizenz**: siehe `LICENSE` im Repository, falls vorhanden, sonst "All
-  Rights Reserved" auswählen bzw. mit dem Nutzer klären, welche Lizenz das
-  Projekt haben soll
+- **Lizenz**: MIT, siehe [`LICENSE`](../LICENSE) im Repository
 - **Datenschutzerklärung**: Text aus [`PRIVACY.md`](../PRIVACY.md) bzw.
   [`PRIVACY.en.md`](../PRIVACY.en.md) einfügen, oder als Link:
   `https://github.com/Stephan-Lefty/nextbookmarks/blob/main/PRIVACY.md`

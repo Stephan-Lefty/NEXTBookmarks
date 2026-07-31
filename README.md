@@ -373,3 +373,7 @@ dort können Fehler und Ideen für nächste Schritte eingetragen werden.
 
 Siehe [PRIVACY.md](PRIVACY.md) für die Datenschutzerklärung der
 Browser-Erweiterung.
+
+## Lizenz
+
+MIT, siehe [LICENSE](LICENSE).
