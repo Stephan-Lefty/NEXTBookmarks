@@ -64,6 +64,18 @@
     "optionsAppPasswordLabel": {
         "message": "App-Passwort:"
     },
+    "optionsAutoSyncLabel": {
+        "message": "Automatischer Sync:"
+    },
+    "optionsAutoSyncOnChange": {
+        "message": "Bei lokalen Änderungen im Browser"
+    },
+    "optionsAutoSyncOnClose": {
+        "message": "Beim Schließen des Browsers"
+    },
+    "optionsAutoSyncHint": {
+        "message": "Die allererste Synchronisation zu einer neuen Verbindung muss immer manuell gestartet werden (Button \"Jetzt synchronisieren\"). Danach läuft es automatisch nach der hier gewählten Regel."
+    },
     "optionsSaveButton": {
         "message": "Speichern"
     },
@@ -88,8 +100,23 @@
     "optionsBackupButton": {
         "message": "Sicherungskopie exportieren"
     },
-    "optionsBackupDoneStatus": {
-        "message": "Gespeichert!"
+    "optionsBackupDoneCloudStatus": {
+        "message": "Gespeichert und zusätzlich in die Cloud hochgeladen (NEXTBookmarks/backups/)."
+    },
+    "optionsBackupDoneLocalOnlyStatus": {
+        "message": "Lokal gespeichert. Cloud-Upload nicht möglich (keine/falsche Zugangsdaten oder Verbindungsfehler)."
+    },
+    "optionsBackupImportButton": {
+        "message": "Sicherungskopie importieren"
+    },
+    "optionsBackupImportingStatus": {
+        "message": "Importiere…"
+    },
+    "optionsBackupImportDoneStatus": {
+        "message": "$count$ Lesezeichen in einen neuen Ordner importiert.",
+        "placeholders": {
+            "count": { "content": "$1" }
+        }
     },
     "statusImporting": {
         "message": "Importiere…"

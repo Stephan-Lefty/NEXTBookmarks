@@ -9,11 +9,12 @@ document.getElementById('syncMode').addEventListener('change', updateSyncModeHin
 
 // Lädt gespeicherte Werte beim Öffnen der Seite
 document.addEventListener('DOMContentLoaded', async () => {
-    const data = await chrome.storage.sync.get(['serverUrl', 'username', 'appPassword', 'syncMode']);
+    const data = await chrome.storage.sync.get(['serverUrl', 'username', 'appPassword', 'syncMode', 'autoSyncMode']);
     document.getElementById('syncMode').value = data.syncMode || 'rest';
     document.getElementById('serverUrl').value = data.serverUrl || '';
     document.getElementById('username').value = data.username || '';
     document.getElementById('appPassword').value = data.appPassword || '';
+    document.getElementById('autoSyncMode').value = data.autoSyncMode || 'onChange';
     updateSyncModeHint();
 });
 
@@ -23,8 +24,9 @@ document.getElementById('save').addEventListener('click', async () => {
     const serverUrl = document.getElementById('serverUrl').value.replace(/\/$/, '');
     const username = document.getElementById('username').value;
     const appPassword = document.getElementById('appPassword').value;
+    const autoSyncMode = document.getElementById('autoSyncMode').value;
 
-    await chrome.storage.sync.set({ serverUrl, username, appPassword, syncMode });
+    await chrome.storage.sync.set({ serverUrl, username, appPassword, syncMode, autoSyncMode });
     document.getElementById('status').textContent = chrome.i18n.getMessage('optionsSavedStatus');
 
     // Falls noch offen: jetzt, wo Zugangsdaten vorhanden sind, die
@@ -53,6 +55,25 @@ document.getElementById('importSkipped').addEventListener('click', async () => {
 // Sicherungskopie exportieren - die eigentliche Logik steckt in der
 // gemeinsam genutzten Datei export-backup.js (auch vom Popup verwendet).
 document.getElementById('exportBackup').addEventListener('click', async () => {
-    await exportBookmarksBackup();
-    document.getElementById('backupStatus').textContent = chrome.i18n.getMessage('optionsBackupDoneStatus');
+    const result = await exportBookmarksBackup();
+    document.getElementById('backupStatus').textContent = result.cloudUploaded
+        ? chrome.i18n.getMessage('optionsBackupDoneCloudStatus')
+        : chrome.i18n.getMessage('optionsBackupDoneLocalOnlyStatus');
+});
+
+// Sicherungskopie importieren - Logik ebenfalls in export-backup.js.
+document.getElementById('importBackup').addEventListener('click', () => {
+    document.getElementById('importBackupFile').click();
+});
+document.getElementById('importBackupFile').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    event.target.value = '';
+    if (!file) return;
+
+    const backupStatusEl = document.getElementById('backupStatus');
+    backupStatusEl.textContent = chrome.i18n.getMessage('optionsBackupImportingStatus');
+
+    const content = await file.text();
+    const imported = await importBookmarksBackup(content);
+    backupStatusEl.textContent = chrome.i18n.getMessage('optionsBackupImportDoneStatus', [String(imported)]);
 });
