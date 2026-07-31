@@ -34,6 +34,10 @@ document.getElementById('save').addEventListener('click', async () => {
     chrome.runtime.sendMessage({ action: 'checkImportPrompt' });
 });
 
+document.getElementById('closeSettings').addEventListener('click', () => {
+    window.close();
+});
+
 document.getElementById('importSkipped').addEventListener('click', async () => {
     const importStatusEl = document.getElementById('importStatus');
     importStatusEl.textContent = chrome.i18n.getMessage('statusImporting');
