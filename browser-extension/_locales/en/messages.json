@@ -64,6 +64,18 @@
     "optionsAppPasswordLabel": {
         "message": "App password:"
     },
+    "optionsAutoSyncLabel": {
+        "message": "Automatic sync:"
+    },
+    "optionsAutoSyncOnChange": {
+        "message": "On local changes in the browser"
+    },
+    "optionsAutoSyncOnClose": {
+        "message": "When closing the browser"
+    },
+    "optionsAutoSyncHint": {
+        "message": "The very first sync to a new connection always has to be started manually (\"Sync now\" button). After that it runs automatically according to the rule chosen here."
+    },
     "optionsSaveButton": {
         "message": "Save"
     },
@@ -88,8 +100,23 @@
     "optionsBackupButton": {
         "message": "Export backup"
     },
-    "optionsBackupDoneStatus": {
-        "message": "Saved!"
+    "optionsBackupDoneCloudStatus": {
+        "message": "Saved and also uploaded to the cloud (NEXTBookmarks/backups/)."
+    },
+    "optionsBackupDoneLocalOnlyStatus": {
+        "message": "Saved locally. Cloud upload not possible (no/wrong credentials or connection error)."
+    },
+    "optionsBackupImportButton": {
+        "message": "Import backup"
+    },
+    "optionsBackupImportingStatus": {
+        "message": "Importing…"
+    },
+    "optionsBackupImportDoneStatus": {
+        "message": "$count$ bookmarks imported into a new folder.",
+        "placeholders": {
+            "count": { "content": "$1" }
+        }
     },
     "statusImporting": {
         "message": "Importing…"

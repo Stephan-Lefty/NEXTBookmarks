@@ -28,6 +28,26 @@ document.getElementById('openSettings').addEventListener('click', () => {
 // Einstellungen aus genutzt.
 document.getElementById('exportBackup').addEventListener('click', async () => {
     const statusEl = document.getElementById('status');
-    await exportBookmarksBackup();
-    statusEl.textContent = chrome.i18n.getMessage('optionsBackupDoneStatus');
+    const result = await exportBookmarksBackup();
+    statusEl.textContent = result.cloudUploaded
+        ? chrome.i18n.getMessage('optionsBackupDoneCloudStatus')
+        : chrome.i18n.getMessage('optionsBackupDoneLocalOnlyStatus');
+});
+
+// Sicherungskopie importieren - öffnet die Dateiauswahl, legt die
+// gefundenen Lesezeichen in einem eigenen neuen Ordner an.
+document.getElementById('importBackup').addEventListener('click', () => {
+    document.getElementById('importBackupFile').click();
+});
+document.getElementById('importBackupFile').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    event.target.value = ''; // dieselbe Datei später erneut auswählbar machen
+    if (!file) return;
+
+    const statusEl = document.getElementById('status');
+    statusEl.textContent = chrome.i18n.getMessage('optionsBackupImportingStatus');
+
+    const content = await file.text();
+    const imported = await importBookmarksBackup(content);
+    statusEl.textContent = chrome.i18n.getMessage('optionsBackupImportDoneStatus', [String(imported)]);
 });

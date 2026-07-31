@@ -38,6 +38,15 @@
             <input id="appPassword" type="password">
         </div>
 
+        <div class="field">
+            <label for="autoSyncMode" data-i18n="optionsAutoSyncLabel"></label>
+            <select id="autoSyncMode">
+                <option value="onChange" data-i18n="optionsAutoSyncOnChange"></option>
+                <option value="onClose" data-i18n="optionsAutoSyncOnClose"></option>
+            </select>
+            <p class="hint" data-i18n="optionsAutoSyncHint"></p>
+        </div>
+
         <div class="actions">
             <button id="save" class="primary" data-i18n="optionsSaveButton"></button>
             <span id="status" class="status"></span>
@@ -58,6 +67,8 @@
         <p data-i18n="optionsBackupDescription"></p>
         <div class="actions">
             <button id="exportBackup" data-i18n="optionsBackupButton"></button>
+            <button id="importBackup" data-i18n="optionsBackupImportButton"></button>
+            <input type="file" id="importBackupFile" accept=".html,.htm" style="display:none">
             <span id="backupStatus" class="status"></span>
         </div>
     </section>

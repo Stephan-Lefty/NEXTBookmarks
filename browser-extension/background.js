@@ -327,6 +327,35 @@ async function saveSyncState(settings, state) {
     await browser.storage.local.set({ [key]: state });
 }
 
+// Merkt sich pro Server+Konto, ob schon einmal erfolgreich synchronisiert
+// wurde. Solange das nicht der Fall ist, laufen automatische Syncs
+// (Timer, Änderungs-Trigger, "beim Schließen") nicht von selbst los - die
+// allererste Synchronisation zu einer (neuen) Verbindung muss der Nutzer
+// bewusst manuell anstoßen (Button im Popup oder "Ja" beim Onboarding).
+async function hasCompletedFirstSync(settings) {
+    const key = profileStorageKey(settings, 'firstSyncDone');
+    const data = await browser.storage.local.get([key]);
+    return !!data[key];
+}
+
+async function markFirstSyncDone(settings) {
+    const key = profileStorageKey(settings, 'firstSyncDone');
+    await browser.storage.local.set({ [key]: true });
+}
+
+// Prüft, ob ein automatischer Sync gerade erlaubt ist: Zugangsdaten
+// müssen vorhanden sein, die Verbindung muss schon einmal manuell
+// bestätigt worden sein, und der gewählte Auto-Sync-Modus muss zum
+// Auslöser passen (requiredMode: 'onChange' oder 'onClose').
+async function isAutoSyncAllowed(requiredMode) {
+    const { serverUrl, username, appPassword, syncMode, autoSyncMode } = await browser.storage.sync.get([
+        'serverUrl', 'username', 'appPassword', 'syncMode', 'autoSyncMode'
+    ]);
+    if (!serverUrl || !username || !appPassword) return false;
+    if ((autoSyncMode || 'onChange') !== requiredMode) return false;
+    return hasCompletedFirstSync({ serverUrl, username, appPassword, syncMode: syncMode || 'rest' });
+}
+
 // ---- Der eigentliche Zwei-Wege-Abgleich --------------------------------
 
 // Verhindert, dass zwei Syncs gleichzeitig laufen: Das Herunterladen
@@ -503,6 +532,7 @@ async function runSync() {
 
     await backend.commit(settings);
     await saveSyncState(settings, newSyncState);
+    await markFirstSyncDone(settings);
     return { success: true, created, updated, deleted, conflicts };
 }
 
@@ -550,15 +580,25 @@ async function maybeShowOnboarding() {
     chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
 }
 
+// Der periodische Timer läuft unabhängig vom gewählten Auto-Sync-Modus
+// als grundsätzliches Sicherheitsnetz - aber genau wie die anderen
+// automatischen Auslöser erst, nachdem einmal manuell synchronisiert
+// wurde (siehe hasCompletedFirstSync).
 browser.alarms.create(SYNC_ALARM_NAME, { periodInMinutes: SYNC_INTERVAL_MINUTES });
-browser.alarms.onAlarm.addListener(alarm => {
-    if (alarm.name === SYNC_ALARM_NAME) {
-        syncBookmarks().catch(err => console.error('Automatischer Sync fehlgeschlagen:', err));
+browser.alarms.onAlarm.addListener(async alarm => {
+    if (alarm.name !== SYNC_ALARM_NAME) return;
+    try {
+        const settings = await getSettings();
+        if (!(await hasCompletedFirstSync(settings))) return;
+    } catch {
+        return; // keine Zugangsdaten hinterlegt
     }
+    syncBookmarks().catch(err => console.error('Automatischer Sync fehlgeschlagen:', err));
 });
 
-// Zusätzlich: kurz nach lokalen Änderungen synchronisieren (entprellt,
-// damit nicht bei jeder einzelnen Änderung sofort ein Sync losläuft)
+// Zusätzlich, je nach Einstellung ("Automatischer Sync" in den
+// Einstellungen): kurz nach lokalen Änderungen synchronisieren (entprellt,
+// damit nicht bei jeder einzelnen Änderung sofort ein Sync losläuft) ...
 let debounceTimer = null;
 function scheduleQuickSync() {
     // Läuft gerade schon ein Sync, kommt diese Änderung höchstwahrscheinlich
@@ -570,7 +610,8 @@ function scheduleQuickSync() {
     if (syncInProgress) return;
 
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
+    debounceTimer = setTimeout(async () => {
+        if (!(await isAutoSyncAllowed('onChange'))) return;
         syncBookmarks().catch(err => console.error('Sync nach Änderung fehlgeschlagen:', err));
     }, 5000);
 }
@@ -578,3 +619,18 @@ browser.bookmarks.onCreated.addListener(scheduleQuickSync);
 browser.bookmarks.onRemoved.addListener(scheduleQuickSync);
 browser.bookmarks.onChanged.addListener(scheduleQuickSync);
 browser.bookmarks.onMoved.addListener(scheduleQuickSync);
+
+// ... oder alternativ beim Schließen des Browsers (letztes Fenster
+// geschlossen). EINSCHRÄNKUNG: Es gibt in Browser-Erweiterungen kein
+// zuverlässiges "Browser wird jetzt beendet"-Ereignis - windows.onRemoved
+// feuert zwar beim Schließen des letzten Fensters, aber der Netzwerk-
+// Request läuft dann im Wettlauf gegen das tatsächliche Beenden des
+// Browserprozesses und kann abgeschnitten werden, bevor er fertig ist.
+// Bewusst als "so gut wie möglich", nicht als Garantie zu verstehen.
+chrome.windows.onRemoved.addListener(async () => {
+    const remainingWindows = await chrome.windows.getAll();
+    if (remainingWindows.length > 0) return; // noch andere Fenster offen
+
+    if (!(await isAutoSyncAllowed('onClose'))) return;
+    syncBookmarks().catch(err => console.error('Sync beim Schließen fehlgeschlagen:', err));
+});
