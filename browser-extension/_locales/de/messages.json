@@ -85,6 +85,9 @@
     "optionsSaveButton": {
         "message": "Speichern"
     },
+    "optionsCloseButton": {
+        "message": "Einstellungen schließen"
+    },
     "optionsSavedStatus": {
         "message": "Gespeichert!"
     },

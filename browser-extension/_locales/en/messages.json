@@ -85,6 +85,9 @@
     "optionsSaveButton": {
         "message": "Save"
     },
+    "optionsCloseButton": {
+        "message": "Close settings"
+    },
     "optionsSavedStatus": {
         "message": "Saved!"
     },
