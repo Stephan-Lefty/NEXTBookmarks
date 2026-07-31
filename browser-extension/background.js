@@ -52,6 +52,19 @@ async function getSettings() {
     if (!serverUrl || !username || !appPassword) {
         throw new Error(chrome.i18n.getMessage('errorMissingCredentials'));
     }
+
+    // Die Website-Zugriffsberechtigung wird gezielt beim Speichern in den
+    // Einstellungen angefragt (siehe options.js) statt pauschal beim
+    // Installieren - anders als die Zugangsdaten selbst wird sie aber
+    // NICHT über browser.storage.sync zwischen Geräten synchronisiert.
+    // Auf einem neuen Gerät mit bereits synchronisierten Zugangsdaten
+    // fehlt sie deshalb ggf. noch.
+    const url = new URL(serverUrl);
+    const originPattern = `${url.protocol}//${url.host}/*`;
+    if (!(await browser.permissions.contains({ origins: [originPattern] }))) {
+        throw new Error(chrome.i18n.getMessage('errorHostPermissionMissing'));
+    }
+
     return { serverUrl, username, appPassword, syncMode: syncMode || 'rest' };
 }
 

@@ -53,5 +53,9 @@ if (typeof browser === 'undefined') {
         tabs: {
             create: (details) => new Promise(resolve => chrome.tabs.create(details, resolve)),
         },
+        permissions: {
+            request: (perms) => new Promise(resolve => chrome.permissions.request(perms, resolve)),
+            contains: (perms) => new Promise(resolve => chrome.permissions.contains(perms, resolve)),
+        },
     };
 }

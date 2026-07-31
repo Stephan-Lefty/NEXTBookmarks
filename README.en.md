@@ -352,3 +352,8 @@ test instance (see section C above) whether a change works:
 The `<bugs>` address in `nextcloud-app/appinfo/info.xml` points to
 [github.com/Stephan-Lefty/nextbookmarks/issues](https://github.com/Stephan-Lefty/nextbookmarks/issues) -
 that's where bugs and ideas for next steps can be filed.
+
+## Privacy
+
+See [PRIVACY.en.md](PRIVACY.en.md) for the browser extension's privacy
+policy.

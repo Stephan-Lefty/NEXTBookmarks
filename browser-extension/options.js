@@ -24,6 +24,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateSyncModeHint();
 });
 
+// Liefert das Berechtigungsmuster (z.B. "https://cloud.example.com/*") für
+// eine eingegebene Server-URL, oder null bei ungültiger URL.
+function originPatternFor(serverUrl) {
+    try {
+        const url = new URL(serverUrl);
+        return `${url.protocol}//${url.host}/*`;
+    } catch {
+        return null;
+    }
+}
+
 // Speichert die Eingaben, wenn auf "Speichern" geklickt wird
 document.getElementById('save').addEventListener('click', async () => {
     const syncMode = document.getElementById('syncMode').value;
@@ -31,9 +42,26 @@ document.getElementById('save').addEventListener('click', async () => {
     const username = document.getElementById('username').value;
     const appPassword = document.getElementById('appPassword').value;
     const autoSyncMode = document.getElementById('autoSyncMode').value;
+    const statusEl = document.getElementById('status');
+
+    // Statt pauschal beim Installieren Zugriff auf "alle Websites" zu
+    // verlangen (schlecht für Store-Review und Privatsphäre), wird die
+    // Berechtigung erst hier - gezielt für die eingetragene Nextcloud-
+    // Domain - angefragt. Muss als direkte Reaktion auf den Klick
+    // passieren, sonst blockiert der Browser den Dialog.
+    const originPattern = originPatternFor(serverUrl);
+    if (!originPattern) {
+        statusEl.textContent = chrome.i18n.getMessage('errorInvalidServerUrl');
+        return;
+    }
+    const granted = await browser.permissions.request({ origins: [originPattern] });
+    if (!granted) {
+        statusEl.textContent = chrome.i18n.getMessage('errorPermissionDenied');
+        return;
+    }
 
     await browser.storage.sync.set({ serverUrl, username, appPassword, syncMode, autoSyncMode });
-    document.getElementById('status').textContent = chrome.i18n.getMessage('optionsSavedStatus');
+    statusEl.textContent = chrome.i18n.getMessage('optionsSavedStatus');
 
     // Falls noch offen: jetzt, wo Zugangsdaten vorhanden sind, die
     // "vorhandene Lesezeichen importieren?"-Frage anzeigen.
