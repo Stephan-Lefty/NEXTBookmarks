@@ -28,6 +28,30 @@ fetch), it runs unchanged or with minimal adjustments in Chrome, Firefox and
 Edge. And because the app logic lives in Nextcloud, the server's operating
 system doesn't matter.
 
+## Two connection types
+
+In the extension settings, the "Connection type" field lets you choose how
+syncing happens:
+
+- **Nextcloud app (App Store)**: uses the REST API of the installed
+  `nextcloud-app` (see above) – fine-grained, with its own web UI inside
+  Nextcloud. Requires the app to be installed on the server (see
+  "Installing the Nextcloud app" below).
+- **WebDAV folder (no server app)**: stores all bookmarks as a single file
+  in the `NEXTBookmarks` folder in your Nextcloud files, via the standard
+  WebDAV protocol. **Nothing needs to be installed on the server for
+  this** – works on any Nextcloud you have a username + app password for,
+  even managed offerings without SSH/App Store access (e.g. Hetzner Storage
+  Share). The trade-off: no overview page inside Nextcloud, and
+  finer-grained conflict detection isn't possible due to technical
+  WebDAV/CORS limitations (see "Known limitations" below).
+
+Both connection types share the same sync logic (two-way sync, conflict
+resolution, safety net etc., see below) – the difference is only in
+where/how the bookmarks are stored on the server.
+
+![Settings with WebDAV connection](docs/screenshots/settings-window.png)
+
 ## Folder structure
 
 ```
@@ -51,15 +75,26 @@ nextbookmarks/
 │   └── composer.json
 └── browser-extension/
     ├── manifest.json         # Extension configuration
-    ├── background.js         # Sync logic (the core piece)
-    ├── popup.html / popup.js # "Sync now" click button
-    └── options.html / options.js  # Enter server URL & credentials
+    ├── background.js         # Sync logic (core piece, both connection types)
+    ├── export-backup.js      # Local + cloud backup (export/import)
+    ├── theme.css             # Shared look (light/dark)
+    ├── popup.html / popup.js # Popup menu ("Sync now" etc.)
+    ├── options.html / options.js  # Settings (server URL, credentials, ...)
+    ├── onboarding.html / onboarding.js  # Import prompt after installation
+    └── _locales/de, _locales/en  # Translations (German/English)
 ```
 
 ## Installing the Nextcloud app
 
-The app itself is identical in both cases – the difference is only how much
-access you have to the server Nextcloud runs on.
+This section only applies to the **"Nextcloud app (App Store)"** connection
+type (see "Two connection types" above). If you use **"WebDAV folder (no
+server app)"** instead, you can skip this section entirely – it requires no
+installation on the server at all, you just enter the Nextcloud URL,
+username and app password directly in the browser extension.
+
+For the App Store variant, the app itself is identical in both cases – the
+difference is only how much access you have to the server Nextcloud runs
+on.
 
 ### A) Self-hosted Nextcloud (your own server or VPS)
 
@@ -91,15 +126,20 @@ Server" on which you installed Nextcloud yourself).
 Many providers offer a **managed** Nextcloud instance (you only get a
 Nextcloud account, no server/SSH access). There, usually **only the official
 Nextcloud App Store** can be used via the web UI – custom, unpublished apps
-like this one can't simply be installed with a click. Possible paths:
+like this one can't simply be installed with a click.
+
+**Easiest path in this case: choose the "WebDAV folder (no server app)"
+connection type** (see "Two connection types" above) – this also works with
+**Hetzner Storage Share** and other offerings with no SSH/root access
+whatsoever, since nothing needs to be installed on the server. Alternatively,
+here are ways to still use the App Store variant:
 
 1. **Ask the provider**: Some hosting packages still include SFTP access to
    the `apps/` folder, or support will install a custom app on request.
    Worth a quick ask – if yes, just continue with the steps from section A.
    *Exception: with **Hetzner Storage Share** this is explicitly excluded –
    there is no SSH/root access at all, and only apps from the official
-   Nextcloud App Store can be enabled. For Storage Share, jump straight to
-   option 2 or 3 (see also section C below for a quick local test).*
+   Nextcloud App Store can be enabled.*
 2. **Switch to your own (unmanaged) server**: e.g. rent a "Hetzner Cloud
    Server" (VPS) instead of the managed Nextcloud product and install
    Nextcloud there yourself – then section A applies again with full
@@ -147,10 +187,18 @@ with your real Hetzner cloud, and you can remove it any time with
 ## Loading the browser extension for testing
 
 1. Chrome/Edge: open `chrome://extensions` → enable "Developer mode" →
-   "Load unpacked" → select the `browser-extension` folder.
+   "Load unpacked" → select the `browser-extension` folder. The extension
+   then shows up in the "All extensions" list (screenshots below show the
+   German UI, the default locale; English is fully supported too):
+
+   ![NEXTBookmarks in the extensions list](docs/screenshots/extensions-page.png)
 2. In the extension settings, enter the Nextcloud URL, your username and
    the app password.
-3. Click the extension icon → "Sync now".
+3. Click the extension icon in the toolbar
+
+   ![Icon in the browser toolbar](docs/screenshots/toolbar-icon.png)
+
+   → "Sync now".
 
 ## What already works
 
@@ -177,10 +225,26 @@ with your real Hetzner cloud, and you can remove it any time with
 - **Folder structure**: the folder path (e.g. `Bookmarks Bar/Work`) is
   transferred as well; missing folders are created locally automatically
   when downloading.
-- **Automatic sync**: runs every 15 minutes in the background
-  (`browser.alarms`) and additionally shortly after every local change
-  (debounced, 5 seconds). The "Sync now" button remains available for
-  manual triggering.
+- **Automatic sync (configurable)**: choose in the settings between "On
+  local changes in the browser" (debounced, 5 seconds after the last
+  change) and "When closing the browser" (best-effort, see the note at the
+  `chrome.windows.onRemoved` listener in `background.js` - not always
+  reliable during an actual browser shutdown). A background sync also runs
+  every 15 minutes (`browser.alarms`). **The very first sync to a new
+  connection always has to be started manually via the "Sync now"
+  button** – only after that does the automatic rule take over. This lets
+  you check that the correct server/account is configured before the first
+  (potentially consequential) automatic run.
+- **Backup export/import**: export saves all current bookmarks as an HTML
+  file in Netscape Bookmark format (importable into any browser) – locally
+  on your computer and additionally uploaded automatically to the cloud
+  (`NEXTBookmarks/backups/`, via WebDAV, independent of the chosen
+  connection type). Importing a backup creates the contained bookmarks in a
+  new, isolated folder, without altering existing bookmarks.
+- **Safety net against mass deletion**: if a sync would delete more than
+  half of the known bookmarks (e.g. because the wrong server/account was
+  entered by mistake), it aborts completely instead of carrying out the
+  deletion, with an error message prompting you to check your credentials.
 - **Cross-browser compatibility**: `browser-polyfill-shim.js` ensures the
   same code runs in Chrome/Edge (only `chrome.*` available) and Firefox
   (native, promise-based `browser.*`). Publishing to the Firefox store
@@ -198,6 +262,13 @@ with your real Hetzner cloud, and you can remove it any time with
 - **Icon**: `browser-extension/icons/` contains a blue icon in 16/48/128px
   (bookmark shape with sync arrows), generated from `icon-source.svg`. The
   same icon also lives under `nextcloud-app/img/` for the web UI.
+- **Popup menu**: closes itself automatically after 10 seconds of
+  inactivity (with a visible countdown "Window closes in ... seconds"),
+  any click resets the timer. From here you can trigger a sync, open
+  settings (opens as its own, appropriately sized window instead of a
+  browser tab), and export/import a backup.
+
+  ![Popup menu](docs/screenshots/popup-menu.png)
 - **Web UI** (inside Nextcloud, "NEXTBookmarks" menu item): bookmarks are
   displayed grouped by folder; clicking a folder expands the title (bold)
   and URL (clickable, opens in a new tab) of the contained bookmarks.
@@ -244,6 +315,12 @@ test instance (see section C above) whether a change works:
 - For very large numbers of bookmarks (several thousand), a more efficient,
   incremental API (e.g. "only changes since timestamp X") would make sense
   instead of loading the complete list every time.
+- **WebDAV mode, technical limitation**: for CORS reasons, a WebDAV
+  response's `ETag` header isn't readable in the browser (not part of the
+  default CORS-exposed response headers). Conflict detection on writes
+  therefore uses `Last-Modified`/`If-Unmodified-Since` instead of
+  `ETag`/`If-Match` – functionally equivalent, but with second- rather than
+  millisecond-precision.
 
 ## Reporting bugs
 
