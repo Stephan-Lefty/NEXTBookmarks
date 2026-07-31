@@ -29,6 +29,31 @@ nutzt, läuft sie unverändert oder mit minimalen Anpassungen in Chrome,
 Firefox und Edge. Und weil die App-Logik in Nextcloud liegt, spielt das
 Betriebssystem des Servers keine Rolle.
 
+## Zwei Verbindungsarten
+
+In den Extension-Einstellungen wählst du unter "Verbindungsart", wie
+synchronisiert wird:
+
+- **Nextcloud-App (App Store)**: nutzt die REST-API der installierten
+  `nextcloud-app` (siehe oben) – feingranular, mit eigener Web-Oberfläche
+  innerhalb von Nextcloud. Setzt voraus, dass die App auf dem Server
+  installiert ist (siehe "Nextcloud-App installieren" unten).
+- **WebDAV-Ordner (ohne Server-App)**: speichert alle Lesezeichen als eine
+  einzelne Datei im Ordner `NEXTBookmarks` in deinen Nextcloud-Dateien, über
+  das Standard-WebDAV-Protokoll. **Es muss dafür nichts auf dem Server
+  installiert werden** – funktioniert auf jeder Nextcloud, für die du
+  Benutzername + App-Passwort hast, auch bei verwalteten Angeboten ohne
+  SSH-/App-Store-Zugriff (z.B. Hetzner Storage Share). Der Nachteil: keine
+  Übersichtsseite innerhalb von Nextcloud, und feingranularere
+  Konflikterkennung ist wegen technischer Einschränkungen von WebDAV/CORS
+  nicht möglich (siehe "Bekannte Grenzen" unten).
+
+Beide Verbindungsarten teilen sich dieselbe Sync-Logik (Zwei-Wege-Sync,
+Konfliktlösung, Sicherheitsnetz usw., siehe unten) – der Unterschied
+steckt nur darin, wo/wie die Lesezeichen auf dem Server abgelegt werden.
+
+![Einstellungen mit WebDAV-Verbindung](docs/screenshots/settings-window.png)
+
 ## Ordnerstruktur
 
 ```
@@ -52,15 +77,27 @@ nextbookmarks/
 │   └── composer.json
 └── browser-extension/
     ├── manifest.json         # Extension-Konfiguration
-    ├── background.js         # Sync-Logik (Kernstück)
-    ├── popup.html / popup.js # Klick-Button "Jetzt synchronisieren"
-    └── options.html / options.js  # Eintragen von Server-URL & Zugangsdaten
+    ├── background.js         # Sync-Logik (Kernstück, beide Verbindungsarten)
+    ├── export-backup.js      # Lokale + Cloud-Sicherungskopie (Export/Import)
+    ├── theme.css             # Gemeinsames Erscheinungsbild (hell/dunkel)
+    ├── popup.html / popup.js # Popup-Menü ("Jetzt synchronisieren" usw.)
+    ├── options.html / options.js  # Einstellungen (Server-URL, Zugangsdaten, ...)
+    ├── onboarding.html / onboarding.js  # Import-Abfrage nach Installation
+    └── _locales/de, _locales/en  # Übersetzungen (Deutsch/Englisch)
 ```
 
 ## Nextcloud-App installieren
 
-Die App selbst ist in beiden Fällen identisch – der Unterschied liegt nur
-darin, wie viel Zugriff du auf den Server hast, auf dem Nextcloud läuft.
+Dieser Abschnitt gilt nur für die Verbindungsart **"Nextcloud-App (App
+Store)"** (siehe "Zwei Verbindungsarten" oben). Nutzt du stattdessen
+**"WebDAV-Ordner (ohne Server-App)"**, kannst du diesen Abschnitt komplett
+überspringen – dafür ist keinerlei Installation auf dem Server nötig, du
+trägst einfach Nextcloud-URL, Benutzername und App-Passwort direkt in der
+Browser-Extension ein.
+
+Für die App-Store-Variante ist die App selbst in beiden Fällen identisch –
+der Unterschied liegt nur darin, wie viel Zugriff du auf den Server hast,
+auf dem Nextcloud läuft.
 
 ### A) Selbst gehostete Nextcloud (eigener Server oder eigene VPS)
 
@@ -93,7 +130,14 @@ Viele Anbieter stellen eine **verwaltete** Nextcloud-Instanz bereit (du
 bekommst nur einen Nextcloud-Zugang, keinen Server-/SSH-Zugriff). Dort lässt
 sich normalerweise **nur der offizielle Nextcloud App Store** über die
 Weboberfläche nutzen – eigene, unveröffentlichte Apps wie diese hier lassen
-sich nicht einfach per Klick installieren. Mögliche Wege:
+sich nicht einfach per Klick installieren.
+
+**Einfachster Weg in diesem Fall: die Verbindungsart "WebDAV-Ordner (ohne
+Server-App)" wählen** (siehe "Zwei Verbindungsarten" oben) – das
+funktioniert auch bei **Hetzner Storage Share** und anderen Angeboten ohne
+jeglichen SSH-/Root-Zugriff, weil dabei nichts auf dem Server installiert
+werden muss. Alternativ gibt es diese Wege, um trotzdem die App-Store-Variante
+nutzen zu können:
 
 1. **Beim Anbieter nachfragen**: Manche Hosting-Pakete enthalten trotzdem
    SFTP-Zugriff auf den `apps/`-Ordner, oder der Support installiert eine
@@ -101,9 +145,7 @@ sich nicht einfach per Klick installieren. Mögliche Wege:
    ja, einfach mit den Schritten aus Bereich A weitermachen.
    *Ausnahme: Bei **Hetzner Storage Share** ist das explizit ausgeschlossen
    – dort gibt es keinerlei SSH-/Root-Zugriff und es lassen sich nur Apps
-   aus dem offiziellen Nextcloud App Store aktivieren. Für Storage Share
-   direkt zu Option 2 oder 3 springen (siehe auch Bereich C weiter unten
-   für einen schnellen, lokalen Test).*
+   aus dem offiziellen Nextcloud App Store aktivieren.*
 2. **Auf einen eigenen (unverwalteten) Server wechseln**: z.B. einen
    "Hetzner Cloud Server" (VPS) statt des Managed-Nextcloud-Produkts mieten
    und Nextcloud dort selbst installieren – dann greift wieder Bereich A
@@ -155,9 +197,16 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
 
 1. Chrome/Edge: `chrome://extensions` öffnen → "Entwicklermodus" aktivieren
    → "Entpackte Erweiterung laden" → Ordner `browser-extension` auswählen.
+   Die Erweiterung erscheint dann in der Liste "Alle Erweiterungen":
+
+   ![NEXTBookmarks in der Erweiterungsübersicht](docs/screenshots/extensions-page.png)
 2. In den Extension-Einstellungen die Nextcloud-URL, deinen Benutzernamen
    und das App-Passwort eintragen.
-3. Über das Extension-Icon → "Jetzt synchronisieren" klicken.
+3. Über das Extension-Icon in der Browserleiste
+
+   ![Icon in der Browserleiste](docs/screenshots/toolbar-icon.png)
+
+   → "Jetzt synchronisieren" klicken.
 
 ## Was jetzt bereits funktioniert
 
@@ -185,9 +234,29 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
 - **Ordnerstruktur**: Der Ordnerpfad (z.B. `Lesezeichenleiste/Arbeit`) wird
   mit übertragen; beim Herunterladen werden fehlende Ordner lokal automatisch
   angelegt.
-- **Automatischer Sync**: läuft alle 15 Minuten im Hintergrund (`browser.alarms`)
-  und zusätzlich kurz nach jeder lokalen Änderung (entprellt, 5 Sekunden).
-  Der Button "Jetzt synchronisieren" bleibt für manuelles Auslösen erhalten.
+- **Automatischer Sync (konfigurierbar)**: in den Einstellungen wählbar
+  zwischen "Bei lokalen Änderungen im Browser" (entprellt, 5 Sekunden nach
+  der letzten Änderung) und "Beim Schließen des Browsers" (best-effort,
+  siehe Hinweis am `chrome.windows.onRemoved`-Listener in `background.js` -
+  während eines tatsächlichen Browser-Shutdowns ist das nicht immer
+  zuverlässig). Zusätzlich läuft alle 15 Minuten ein Hintergrund-Sync
+  (`browser.alarms`). **Die allererste Synchronisation zu einer neuen
+  Verbindung muss immer manuell über den Button "Jetzt synchronisieren"
+  gestartet werden** – erst danach greift die automatische Regel. So lässt
+  sich vor dem ersten (potenziell folgenreichen) automatischen Lauf noch
+  prüfen, ob wirklich der richtige Server/das richtige Konto eingetragen ist.
+- **Sicherungskopie exportieren/importieren**: Export speichert alle
+  aktuellen Lesezeichen als HTML-Datei im Netscape-Bookmark-Format
+  (importierbar in jeden Browser) – lokal auf dem Rechner und zusätzlich
+  automatisch in die Cloud hochgeladen (`NEXTBookmarks/backups/`, per
+  WebDAV, unabhängig von der gewählten Verbindungsart). Import einer
+  Sicherungskopie legt die enthaltenen Lesezeichen in einem neuen,
+  isolierten Ordner an, ohne bestehende Lesezeichen zu verändern.
+- **Sicherheitsnetz gegen Massenlöschung**: Würde ein Sync mehr als die
+  Hälfte der bekannten Lesezeichen löschen (z.B. weil versehentlich der
+  falsche Server/Account eingetragen wurde), bricht er komplett ab, statt
+  die Löschung durchzuführen – mit einer Fehlermeldung, die zur Prüfung der
+  Zugangsdaten auffordert.
 - **Cross-Browser-Kompatibilität**: `browser-polyfill-shim.js` sorgt dafür,
   dass derselbe Code in Chrome/Edge (nur `chrome.*` vorhanden) und Firefox
   (natives, promise-basiertes `browser.*`) läuft. Für den Firefox-Store wäre
@@ -206,6 +275,13 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
 - **Icon**: `browser-extension/icons/` enthält ein blaues Icon in 16/48/128px
   (Lesezeichen-Form mit Sync-Pfeilen), erzeugt aus `icon-source.svg`.
   Dasselbe Icon liegt auch unter `nextcloud-app/img/` für die Web-Oberfläche.
+- **Popup-Menü**: schließt sich automatisch nach 10 Sekunden Inaktivität
+  (mit sichtbarem Countdown "Fenster schließt in ... Sekunden"), jeder Klick
+  setzt den Timer zurück. Von hier aus erreichbar: Sync, Einstellungen
+  (öffnen sich als eigenes, passend großes Fenster statt als Browser-Tab)
+  sowie Sicherungskopie exportieren/importieren.
+
+  ![Popup-Menü](docs/screenshots/popup-menu.png)
 - **Web-Oberfläche** (innerhalb von Nextcloud, Menüpunkt "NEXTBookmarks"):
   Lesezeichen werden nach Ordner gruppiert dargestellt; ein Klick auf
   einen Ordner klappt Titel (fett) und URL (klickbar, öffnet in neuem
@@ -255,6 +331,12 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 - Für sehr viele Lesezeichen (mehrere Tausend) wäre eine effizientere,
   inkrementelle API (z.B. "nur Änderungen seit Zeitpunkt X") sinnvoll statt
   jedes Mal die komplette Liste zu laden.
+- **WebDAV-Modus, technische Einschränkung**: Aus CORS-Gründen ist der
+  `ETag`-Header einer WebDAV-Antwort im Browser nicht auslesbar (nicht Teil
+  der standardmäßig freigegebenen Response-Header). Die Konflikterkennung
+  beim Schreiben nutzt deshalb `Last-Modified`/`If-Unmodified-Since` statt
+  `ETag`/`If-Match` – funktional gleichwertig, aber mit Sekunden- statt
+  Millisekunden-Genauigkeit.
 
 ## Bugs melden
 
