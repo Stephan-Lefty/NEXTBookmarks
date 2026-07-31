@@ -356,3 +356,7 @@ that's where bugs and ideas for next steps can be filed.
 
 See [PRIVACY.en.md](PRIVACY.en.md) for the browser extension's privacy
 policy.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
