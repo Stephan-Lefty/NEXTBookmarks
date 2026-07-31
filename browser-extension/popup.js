@@ -57,11 +57,13 @@ document.getElementById('openSettings').addEventListener('click', () => {
     chrome.windows.create({
         url: chrome.runtime.getURL('options.html'),
         type: 'popup',
+        // Nur ein Startwert für den allerersten Frame, bevor das Fenster
+        // sichtbar wird - options.js misst danach den tatsächlichen
+        // Inhalt und ruft chrome.windows.update() mit der exakt
+        // passenden Größe auf (fitWindowToContent() dort). Muss also bei
+        // künftigen Layout-Änderungen nicht mehr von Hand nachjustiert
+        // werden.
         width: 600,
-        // Vivaldi zeigt bei "popup"-Fenstern trotzdem Titel- und
-        // Adressleiste an (nicht unterdrückbar) - die fressen sichtbar
-        // Höhe weg, daher hier mehr anfordern, als der reine Inhalt
-        // bräuchte.
         height: 720,
     });
     startAutoCloseCountdown();
