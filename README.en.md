@@ -255,11 +255,10 @@ with your real Hetzner cloud, and you can remove it any time with
     live-tested - the extension loads, the service worker starts, all
     pages (popup/settings/onboarding) and the bookmark sync message work
     without errors.
-  - **Firefox**: code has been adapted for Firefox compatibility (see
-    above), but not yet live-tested since no Firefox instance is available
-    in the development environment - feedback after a real test is
-    welcome. Publishing to the Firefox store would additionally require
-    the regular signing/publishing process; the `gecko.id` in the manifest
+  - **Firefox**: live-tested (temporary add-on via `about:debugging`,
+    including a connection to a real Nextcloud) - works. Publishing to the
+    Firefox store would additionally require the regular signing/publishing
+    process; the `gecko.id` in the manifest
     is already prepared for that.
   - **Safari**: currently not supported - see the note further below.
 - **Onboarding import prompt**: right after installation (or as soon as you

@@ -268,9 +268,8 @@ deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
     live getestet - Erweiterung lädt, Service Worker startet, alle Seiten
     (Popup/Einstellungen/Onboarding) sowie die Lesezeichen-Sync-Nachricht
     funktionieren fehlerfrei.
-  - **Firefox**: Code auf Firefox-Kompatibilität umgestellt (s.o.), aber
-    mangels Firefox-Instanz in der Entwicklungsumgebung noch nicht live
-    getestet - Rückmeldung nach einem echten Test willkommen. Für den
+  - **Firefox**: live getestet (temporäres Add-on über `about:debugging`,
+    inkl. Verbindung zu einer echten Nextcloud) - funktioniert. Für den
     Firefox-Store wäre zusätzlich die reguläre Signierung/Veröffentlichung
     nötig; die `gecko.id` im Manifest ist dafür schon vorbereitet.
   - **Safari**: aktuell nicht unterstützt - siehe Hinweis weiter unten.
