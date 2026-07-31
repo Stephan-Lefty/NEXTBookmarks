@@ -175,6 +175,15 @@
     "errorMissingCredentials": {
         "message": "Bitte zuerst die Nextcloud-Zugangsdaten in den Einstellungen eintragen."
     },
+    "errorInvalidServerUrl": {
+        "message": "Die Nextcloud-URL ist ungültig. Bitte mit https:// beginnen, z.B. https://cloud.example.com."
+    },
+    "errorPermissionDenied": {
+        "message": "Ohne Zugriffsberechtigung für diese Nextcloud-Domain kann nicht synchronisiert werden. Bitte erneut auf Speichern klicken und die Berechtigung erlauben."
+    },
+    "errorHostPermissionMissing": {
+        "message": "Für diesen Server wurde auf diesem Gerät noch keine Zugriffsberechtigung erteilt (wird nicht automatisch zwischen Geräten übernommen). Bitte die Einstellungen öffnen und einmal auf Speichern klicken."
+    },
     "errorServerResponse": {
         "message": "Server antwortete mit $status$ bei $path$",
         "placeholders": {

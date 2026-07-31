@@ -369,3 +369,8 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Die `<bugs>`-Adresse in `nextcloud-app/appinfo/info.xml` zeigt auf
 [github.com/Stephan-Lefty/nextbookmarks/issues](https://github.com/Stephan-Lefty/nextbookmarks/issues) -
 dort können Fehler und Ideen für nächste Schritte eingetragen werden.
+
+## Datenschutz
+
+Siehe [PRIVACY.md](PRIVACY.md) für die Datenschutzerklärung der
+Browser-Erweiterung.

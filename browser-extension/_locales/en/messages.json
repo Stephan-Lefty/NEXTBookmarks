@@ -175,6 +175,15 @@
     "errorMissingCredentials": {
         "message": "Please enter your Nextcloud credentials in the settings first."
     },
+    "errorInvalidServerUrl": {
+        "message": "The Nextcloud URL is invalid. Please start with https://, e.g. https://cloud.example.com."
+    },
+    "errorPermissionDenied": {
+        "message": "Can't sync without permission to access this Nextcloud domain. Please click Save again and allow the permission."
+    },
+    "errorHostPermissionMissing": {
+        "message": "No access permission has been granted for this server on this device yet (permissions aren't synced automatically between devices). Please open the settings and click Save once."
+    },
     "errorServerResponse": {
         "message": "Server responded with $status$ at $path$",
         "placeholders": {
