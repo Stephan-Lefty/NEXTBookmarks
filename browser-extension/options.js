@@ -81,3 +81,31 @@ document.getElementById('importBackupFile').addEventListener('change', async (ev
     const imported = await importBookmarksBackup(content);
     backupStatusEl.textContent = chrome.i18n.getMessage('optionsBackupImportDoneStatus', [String(imported)]);
 });
+
+// Passt die Fenstergröße nach dem Laden automatisch an den tatsächlichen
+// Inhalt an, statt sich auf fest verdrahtete Pixelwerte in popup.js zu
+// verlassen. Dadurch muss die Größe nicht mehr von Hand nachjustiert
+// werden, wenn sich der Inhalt der Einstellungen künftig ändert.
+async function fitWindowToContent() {
+    // Zwei Frames abwarten, damit i18n.js die Texte gesetzt hat und das
+    // Layout sich vollständig stabilisiert hat, bevor gemessen wird.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+    const contentWidth = document.documentElement.scrollWidth;
+    const contentHeight = document.documentElement.scrollHeight;
+
+    // Vivaldi zeigt bei "popup"-Fenstern trotzdem Titel-/Adressleiste an,
+    // die zusätzlich zum reinen Seiteninhalt Platz frisst - wie viel genau,
+    // lässt sich nicht vorhersehen, aber jetzt live aus der Differenz
+    // zwischen Außen- und Innenmaßen des aktuellen Fensters berechnen.
+    const chromeWidth = window.outerWidth - window.innerWidth;
+    const chromeHeight = window.outerHeight - window.innerHeight;
+
+    const win = await chrome.windows.getCurrent();
+    await chrome.windows.update(win.id, {
+        width: Math.round(contentWidth + chromeWidth),
+        height: Math.round(contentHeight + chromeHeight),
+    });
+}
+
+document.addEventListener('DOMContentLoaded', fitWindowToContent);
