@@ -1,13 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>NEXTBookmarks</title></head>
-<body style="width:200px">
-    <button id="syncNow" data-i18n="popupSyncButton"></button>
-    <button id="openSettings" data-i18n="popupSettingsButton"></button>
-    <button id="exportBackup" data-i18n="optionsBackupButton"></button>
-    <button id="importBackup" data-i18n="optionsBackupImportButton"></button>
-    <input type="file" id="importBackupFile" accept=".html,.htm" style="display:none">
-    <p id="status" data-i18n="popupStatusReady"></p>
+<head>
+    <meta charset="UTF-8">
+    <title>NEXTBookmarks</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        html, body { width: 260px; }
+        body { background: var(--card-bg); overflow: hidden; }
+        .card { border-radius: 12px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <p class="title">NEXTBookmarks</p>
+        <div class="actions">
+            <button id="syncNow" class="primary" data-i18n="popupSyncButton"></button>
+            <button id="openSettings" data-i18n="popupSettingsButton"></button>
+        </div>
+        <div class="actions">
+            <button id="exportBackup" data-i18n="optionsBackupButton"></button>
+            <button id="importBackup" data-i18n="optionsBackupImportButton"></button>
+            <input type="file" id="importBackupFile" accept=".html,.htm" style="display:none">
+        </div>
+        <p class="status">
+            <span id="status" data-i18n="popupStatusReady"></span>
+            <span id="closeCountdown"></span>
+        </p>
+    </div>
     <script src="i18n.js"></script>
     <script src="export-backup.js"></script>
     <script src="popup.js"></script>

@@ -3,14 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title data-i18n="optionsPageTitle">NEXTBookmarks</title>
-    <link rel="stylesheet" href="options.css">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        body { width: 640px; padding: 20px; }
+        .card h2 {
+            font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em;
+            color: var(--text-muted); margin: 0 0 12px;
+        }
+        .card p { margin: 6px 0 0; }
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+        .columns .card {
+            margin-bottom: 0;
+        }
+        .columns .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <img src="icons/icon48.png" alt="">
-        <h1>NEXTBookmarks</h1>
-    </header>
+    <p class="title">NEXTBookmarks</p>
 
+    <div class="columns">
     <section class="card">
         <h2 data-i18n="optionsConnectionHeading"></h2>
 
@@ -53,25 +73,28 @@
         </div>
     </section>
 
-    <section class="card">
-        <h2 data-i18n="optionsImportHeading"></h2>
-        <p data-i18n="optionsImportDescription"></p>
-        <div class="actions">
-            <button id="importSkipped" data-i18n="optionsImportSkippedButton"></button>
-            <span id="importStatus" class="status"></span>
-        </div>
-    </section>
+    <div class="right-column">
+        <section class="card">
+            <h2 data-i18n="optionsImportHeading"></h2>
+            <p data-i18n="optionsImportDescription"></p>
+            <div class="actions">
+                <button id="importSkipped" data-i18n="optionsImportSkippedButton"></button>
+                <span id="importStatus" class="status"></span>
+            </div>
+        </section>
 
-    <section class="card">
-        <h2 data-i18n="optionsBackupHeading"></h2>
-        <p data-i18n="optionsBackupDescription"></p>
-        <div class="actions">
-            <button id="exportBackup" data-i18n="optionsBackupButton"></button>
-            <button id="importBackup" data-i18n="optionsBackupImportButton"></button>
-            <input type="file" id="importBackupFile" accept=".html,.htm" style="display:none">
-            <span id="backupStatus" class="status"></span>
-        </div>
-    </section>
+        <section class="card">
+            <h2 data-i18n="optionsBackupHeading"></h2>
+            <p data-i18n="optionsBackupDescription"></p>
+            <div class="actions">
+                <button id="exportBackup" data-i18n="optionsBackupButton"></button>
+                <button id="importBackup" data-i18n="optionsBackupImportButton"></button>
+                <input type="file" id="importBackupFile" accept=".html,.htm" style="display:none">
+                <span id="backupStatus" class="status"></span>
+            </div>
+        </section>
+    </div>
+    </div>
 
     <script src="i18n.js"></script>
     <script src="export-backup.js"></script>

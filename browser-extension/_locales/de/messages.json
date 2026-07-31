@@ -11,6 +11,12 @@
     "popupStatusReady": {
         "message": "Bereit."
     },
+    "popupAutoCloseCountdown": {
+        "message": "Fenster schließt in $seconds$ Sekunden…",
+        "placeholders": {
+            "seconds": { "content": "$1" }
+        }
+    },
     "popupStatusSyncing": {
         "message": "Synchronisiere…"
     },
