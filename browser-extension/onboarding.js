@@ -13,7 +13,7 @@ function flattenTree(nodes) {
 }
 
 async function getLocalBookmarkUrls() {
-    const tree = await chrome.bookmarks.getTree();
+    const tree = await browser.bookmarks.getTree();
     return flattenTree(tree).map(n => n.url);
 }
 
@@ -28,8 +28,8 @@ document.getElementById('importYes').addEventListener('click', async () => {
 
     // Löst denselben Sync aus wie der Button im Popup – lädt alle
     // vorhandenen lokalen Lesezeichen zur Nextcloud hoch.
-    const result = await chrome.runtime.sendMessage({ action: 'sync' });
-    await chrome.storage.local.set({ importDecisionPending: false });
+    const result = await browser.runtime.sendMessage({ action: 'sync' });
+    await browser.storage.local.set({ importDecisionPending: false });
 
     statusEl.textContent = result?.success
         ? chrome.i18n.getMessage('onboardingImportDoneStatus', [String(result.created)])
@@ -45,10 +45,10 @@ document.getElementById('importNo').addEventListener('click', async () => {
     // synchronisiert. Pro Server+Konto getrennt gespeichert (siehe
     // background.js), damit ein späterer Wechsel der Nextcloud-Verbindung
     // nicht die Skip-Liste einer ganz anderen Cloud übernimmt.
-    const { serverUrl, username } = await chrome.storage.sync.get(['serverUrl', 'username']);
+    const { serverUrl, username } = await browser.storage.sync.get(['serverUrl', 'username']);
     const skippedUrlsKey = `skippedUrls::${serverUrl}::${username}`;
     const urls = await getLocalBookmarkUrls();
-    await chrome.storage.local.set({ [skippedUrlsKey]: urls, importDecisionPending: false });
+    await browser.storage.local.set({ [skippedUrlsKey]: urls, importDecisionPending: false });
 
     statusEl.textContent = chrome.i18n.getMessage('onboardingSkippedStatus');
 });

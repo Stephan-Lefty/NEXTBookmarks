@@ -1,4 +1,13 @@
-importScripts('browser-polyfill-shim.js');
+// Chrome/Edge laden den Hintergrund als echten Service Worker (MV3
+// "service_worker") - dort ist importScripts() der einzige Weg, den Shim
+// nachzuladen. Firefox nutzt für denselben Manifest-Eintrag stattdessen
+// die MV3-Variante "background.scripts" (kein Service Worker, sondern
+// eine klassische Hintergrundseite ohne importScripts) - dort wurde
+// browser-polyfill-shim.js bereits vorher als eigener Eintrag im
+// scripts-Array geladen, siehe manifest.json.
+if (typeof importScripts === 'function') {
+    importScripts('browser-polyfill-shim.js');
+}
 
 // =====================================================================
 // NEXTBookmarks – Sync-Engine
@@ -577,7 +586,7 @@ async function maybeShowOnboarding() {
     ]);
     if (!serverUrl || !username || !appPassword) return;
 
-    chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
+    browser.tabs.create({ url: browser.runtime.getURL('onboarding.html') });
 }
 
 // Der periodische Timer läuft unabhängig vom gewählten Auto-Sync-Modus
@@ -627,8 +636,8 @@ browser.bookmarks.onMoved.addListener(scheduleQuickSync);
 // Request läuft dann im Wettlauf gegen das tatsächliche Beenden des
 // Browserprozesses und kann abgeschnitten werden, bevor er fertig ist.
 // Bewusst als "so gut wie möglich", nicht als Garantie zu verstehen.
-chrome.windows.onRemoved.addListener(async () => {
-    const remainingWindows = await chrome.windows.getAll();
+browser.windows.onRemoved.addListener(async () => {
+    const remainingWindows = await browser.windows.getAll();
     if (remainingWindows.length > 0) return; // noch andere Fenster offen
 
     if (!(await isAutoSyncAllowed('onClose'))) return;

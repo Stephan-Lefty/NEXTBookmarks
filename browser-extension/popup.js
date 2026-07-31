@@ -39,7 +39,7 @@ document.getElementById('syncNow').addEventListener('click', async () => {
     statusEl.textContent = chrome.i18n.getMessage('popupStatusSyncing');
 
     // Schickt eine Nachricht an background.js, wo die eigentliche Sync-Logik läuft
-    const result = await chrome.runtime.sendMessage({ action: 'sync' });
+    const result = await browser.runtime.sendMessage({ action: 'sync' });
 
     statusEl.textContent = result?.success
         ? chrome.i18n.getMessage('popupStatusDone', [
@@ -54,12 +54,12 @@ document.getElementById('syncNow').addEventListener('click', async () => {
 // statt nur über den Umweg vivaldi://extensions -> Details.
 document.getElementById('openSettings').addEventListener('click', () => {
     stopAutoCloseCountdown();
-    chrome.windows.create({
-        url: chrome.runtime.getURL('options.html'),
+    browser.windows.create({
+        url: browser.runtime.getURL('options.html'),
         type: 'popup',
         // Nur ein Startwert für den allerersten Frame, bevor das Fenster
         // sichtbar wird - options.js misst danach den tatsächlichen
-        // Inhalt und ruft chrome.windows.update() mit der exakt
+        // Inhalt und ruft browser.windows.update() mit der exakt
         // passenden Größe auf (fitWindowToContent() dort). Muss also bei
         // künftigen Layout-Änderungen nicht mehr von Hand nachjustiert
         // werden.

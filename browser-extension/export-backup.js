@@ -54,7 +54,7 @@ function buildBookmarksHtml(tree) {
 // ist. Wirft einen Fehler, wenn keine Zugangsdaten hinterlegt sind oder
 // der Upload fehlschlägt - der Aufrufer entscheidet, wie er das meldet.
 async function uploadBackupToCloud(htmlContent) {
-    const { serverUrl, username, appPassword } = await chrome.storage.sync.get([
+    const { serverUrl, username, appPassword } = await browser.storage.sync.get([
         'serverUrl', 'username', 'appPassword'
     ]);
     if (!serverUrl || !username || !appPassword) {
@@ -97,7 +97,7 @@ async function uploadBackupToCloud(htmlContent) {
 // auch wenn der Cloud-Upload fehlschlägt oder noch keine Verbindung
 // eingerichtet ist.
 async function exportBookmarksBackup() {
-    const tree = await chrome.bookmarks.getTree();
+    const tree = await browser.bookmarks.getTree();
     const htmlContent = buildBookmarksHtml(tree);
 
     const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -169,10 +169,10 @@ async function ensureImportFolder(cache, rootId, path) {
             parentId = cache.get(partKey);
             continue;
         }
-        const children = await chrome.bookmarks.getChildren(parentId);
+        const children = await browser.bookmarks.getChildren(parentId);
         let match = children.find(c => !c.url && c.title === part);
         if (!match) {
-            match = await chrome.bookmarks.create({ parentId, title: part });
+            match = await browser.bookmarks.create({ parentId, title: part });
         }
         parentId = match.id;
         cache.set(partKey, parentId);
@@ -184,7 +184,7 @@ async function ensureImportFolder(cache, rootId, path) {
 async function importBookmarksBackup(fileContent) {
     const items = parseBookmarksHtml(fileContent);
 
-    const importRoot = await chrome.bookmarks.create({
+    const importRoot = await browser.bookmarks.create({
         parentId: '1', // Lesezeichenleiste
         title: `NEXTBookmarks-Import ${new Date().toISOString().slice(0, 10)}`,
     });
@@ -193,7 +193,7 @@ async function importBookmarksBackup(fileContent) {
     let imported = 0;
     for (const item of items) {
         const parentId = await ensureImportFolder(folderCache, importRoot.id, item.folder);
-        await chrome.bookmarks.create({ parentId, title: item.title, url: item.url });
+        await browser.bookmarks.create({ parentId, title: item.title, url: item.url });
         imported++;
     }
     return imported;
