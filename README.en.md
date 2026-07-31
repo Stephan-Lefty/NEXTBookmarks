@@ -50,7 +50,7 @@ Both connection types share the same sync logic (two-way sync, conflict
 resolution, safety net etc., see below) – the difference is only in
 where/how the bookmarks are stored on the server.
 
-![Settings with WebDAV connection](docs/screenshots/settings-window.png)
+![Settings with WebDAV connection](docs/screenshots/settings-window-en.png)
 
 ## Folder structure
 
@@ -268,7 +268,7 @@ with your real Hetzner cloud, and you can remove it any time with
   settings (opens as its own, appropriately sized window instead of a
   browser tab), and export/import a backup.
 
-  ![Popup menu](docs/screenshots/popup-menu.png)
+  ![Popup menu](docs/screenshots/popup-menu-en.png)
 - **Web UI** (inside Nextcloud, "NEXTBookmarks" menu item): bookmarks are
   displayed grouped by folder; clicking a folder expands the title (bold)
   and URL (clickable, opens in a new tab) of the contained bookmarks.
