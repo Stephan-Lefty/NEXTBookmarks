@@ -16,6 +16,7 @@
     --secondary-bg-hover: #e0e3e8;
     --secondary-text: #3d8bff;
     --warning: #f2a93b;
+    --danger: #e5484d;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -32,6 +33,7 @@
         --secondary-bg-hover: #dcdce0;
         --secondary-text: #3d8bff;
         --warning: #f2a93b;
+    --danger: #e5484d;
     }
 }
 

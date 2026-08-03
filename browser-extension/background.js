@@ -65,7 +65,7 @@ async function getSettings() {
         throw new Error(chrome.i18n.getMessage('errorHostPermissionMissing'));
     }
 
-    return { serverUrl, username, appPassword, syncMode: syncMode || 'rest' };
+    return { serverUrl, username, appPassword, syncMode: syncMode || 'webdav' };
 }
 
 function authHeader(username, appPassword) {
@@ -375,7 +375,7 @@ async function isAutoSyncAllowed(requiredMode) {
     ]);
     if (!serverUrl || !username || !appPassword) return false;
     if ((autoSyncMode || 'onChange') !== requiredMode) return false;
-    return hasCompletedFirstSync({ serverUrl, username, appPassword, syncMode: syncMode || 'rest' });
+    return hasCompletedFirstSync({ serverUrl, username, appPassword, syncMode: syncMode || 'webdav' });
 }
 
 // ---- Der eigentliche Zwei-Wege-Abgleich --------------------------------
