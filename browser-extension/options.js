@@ -1,22 +1,20 @@
-// Zeigt je nach gewählter Verbindungsart eine kurze Erklärung an.
+// Zeigt je nach gewählter Verbindungsart eine kurze Erklärung an. Die
+// Option "Nextcloud-App (App Store)" ist im Dropdown ausgegraut/deaktiviert
+// (siehe options.html), solange die App noch nicht im offiziellen Nextcloud
+// App Store freigegeben ist - der rote Hinweistext dazu ist deshalb
+// dauerhaft sichtbar, nicht nur bei ausgewählter Verbindungsart.
 function updateSyncModeHint() {
     const syncMode = document.getElementById('syncMode').value;
     document.getElementById('syncModeHint').textContent = chrome.i18n.getMessage(
         syncMode === 'webdav' ? 'optionsSyncModeWebdavHint' : 'optionsSyncModeRestHint'
     );
-
-    // Warnhinweis, dass die Nextcloud-App noch nicht im offiziellen App
-    // Store veröffentlicht ist, gilt nur für die App-Store-Verbindungsart -
-    // bei WebDAV ist dafür gar keine Installation nötig.
-    const warningEl = document.getElementById('syncModeWarning');
-    warningEl.style.display = syncMode === 'rest' ? '' : 'none';
 }
 document.getElementById('syncMode').addEventListener('change', updateSyncModeHint);
 
 // Lädt gespeicherte Werte beim Öffnen der Seite
 document.addEventListener('DOMContentLoaded', async () => {
     const data = await browser.storage.sync.get(['serverUrl', 'username', 'appPassword', 'syncMode', 'autoSyncMode']);
-    document.getElementById('syncMode').value = data.syncMode || 'rest';
+    document.getElementById('syncMode').value = data.syncMode || 'webdav';
     document.getElementById('serverUrl').value = data.serverUrl || '';
     document.getElementById('username').value = data.username || '';
     document.getElementById('appPassword').value = data.appPassword || '';
