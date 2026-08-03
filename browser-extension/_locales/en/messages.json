@@ -11,6 +11,9 @@
     "popupStatusReady": {
         "message": "Ready."
     },
+    "popupRepoLink": {
+        "message": "Source code on GitHub"
+    },
     "popupAutoCloseCountdown": {
         "message": "Window closes in $seconds$ seconds…",
         "placeholders": {

@@ -1,3 +1,9 @@
+// Zeigt die aktuell installierte Versionsnummer an (aus manifest.json,
+// muss also bei Versions-Updates nicht separat gepflegt werden).
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('version').textContent = 'v' + chrome.runtime.getManifest().version;
+});
+
 // Schließt das Popup automatisch nach 10 Sekunden Ruhe (Countdown neben
 // dem Status sichtbar), damit man es nicht jedes Mal manuell schließen
 // muss. Läuft nur, während gerade nichts passiert - jeder Klick bricht
