@@ -363,6 +363,40 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
      echten Mac verifiziert werden, bevor sich eine Safari-Portierung
      überhaupt sinnvoll planen lässt.
 
+## Änderungsprotokoll
+
+Bezieht sich auf die Versionsnummer der Browser-Erweiterung
+(`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
+
+### 0.1.2
+- Popup zeigt jetzt die aktuell installierte Versionsnummer an.
+- Link zum GitHub-Repository im Popup ergänzt.
+
+### 0.1.1
+- Verbindungsart "Nextcloud-App (App Store)" im Einstellungen-Dropdown
+  ausgegraut, solange die App noch nicht im offiziellen Nextcloud App
+  Store freigegeben ist - WebDAV ist seitdem die Standard-Verbindungsart
+  für neue Installationen.
+- Der Hinweis dazu ist jetzt dauerhaft (statt nur bei ausgewählter
+  Verbindungsart) sichtbar und rot statt nur fett hervorgehoben.
+
+### 0.1.0
+Erste veröffentlichte Version (Chrome Web Store und Firefox Add-ons):
+- Zwei-Wege-Sync zwischen Browser-Lesezeichen und Nextcloud (neue,
+  geänderte, gelöschte Lesezeichen, inkl. Ordnerstruktur).
+- Zwei Verbindungsarten: Nextcloud-App (REST-API) oder WebDAV-Ordner
+  (ohne Server-App, funktioniert auf jeder Nextcloud).
+- Konfigurierbarer automatischer Sync (bei lokalen Änderungen oder beim
+  Schließen des Browsers), erste Synchronisation immer manuell.
+- Sicherungskopie-Export/-Import (lokal und automatisch in die Cloud).
+- Sicherheitsnetz gegen versehentliche Massenlöschung.
+- Deutsch und Englisch.
+- Chrome/Edge/Vivaldi/Brave/Opera und Firefox unterstützt; für Firefox
+  eigens angepasste `browser.*`-API-Nutzung statt Chrome-spezifischem
+  `chrome.*`.
+- Berechtigungen erst zur Laufzeit für die eingetragene Nextcloud-Domain
+  angefragt, nicht pauschal beim Installieren.
+
 ## Bugs melden
 
 Die `<bugs>`-Adresse in `nextcloud-app/appinfo/info.xml` zeigt auf

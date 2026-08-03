@@ -346,6 +346,41 @@ test instance (see section C above) whether a change works:
      possible at all). This would need to be verified on a real Mac first
      before a Safari port could be meaningfully planned.
 
+## Changelog
+
+Refers to the browser extension's version number
+(`browser-extension/manifest.json`), which is also shown in the popup.
+
+### 0.1.2
+- The popup now shows the currently installed version number.
+- Added a link to the GitHub repository in the popup.
+
+### 0.1.1
+- The "Nextcloud app (App Store)" connection type is now grayed out in the
+  settings dropdown until the app is approved in the official Nextcloud
+  App Store - WebDAV has since become the default connection type for new
+  installations.
+- The corresponding hint is now permanently visible (instead of only when
+  that connection type is selected) and highlighted in red instead of just
+  bold.
+
+### 0.1.0
+First published version (Chrome Web Store and Firefox Add-ons):
+- Two-way sync between browser bookmarks and Nextcloud (new, changed, and
+  deleted bookmarks, including folder structure).
+- Two connection types: Nextcloud app (REST API) or WebDAV folder (no
+  server app, works on any Nextcloud).
+- Configurable automatic sync (on local changes or when closing the
+  browser), first sync always manual.
+- Backup export/import (locally and automatically to the cloud).
+- Safety net against accidental mass deletion.
+- German and English.
+- Supports Chrome/Edge/Vivaldi/Brave/Opera and Firefox; uses a
+  Firefox-specific `browser.*` API layer instead of Chrome-only `chrome.*`
+  where needed.
+- Permissions are only requested at runtime for the entered Nextcloud
+  domain, not broadly at install time.
+
 ## Reporting bugs
 
 The `<bugs>` address in `nextcloud-app/appinfo/info.xml` points to
