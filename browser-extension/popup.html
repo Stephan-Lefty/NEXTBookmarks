@@ -13,6 +13,7 @@
 <body>
     <div class="card">
         <p class="title">NEXTBookmarks</p>
+        <p class="version" id="version"></p>
         <div class="actions">
             <button id="syncNow" class="primary" data-i18n="popupSyncButton"></button>
             <button id="openSettings" data-i18n="popupSettingsButton"></button>
@@ -25,6 +26,9 @@
         <p class="status">
             <span id="status" data-i18n="popupStatusReady"></span>
             <span id="closeCountdown"></span>
+        </p>
+        <p class="status">
+            <a id="repoLink" class="repo-link" href="https://github.com/Stephan-Lefty/nextbookmarks" target="_blank" rel="noopener" data-i18n="popupRepoLink"></a>
         </p>
     </div>
     <script src="browser-polyfill-shim.js"></script>

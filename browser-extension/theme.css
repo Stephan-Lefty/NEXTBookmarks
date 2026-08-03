@@ -83,6 +83,22 @@ body.closing {
     letter-spacing: 0.03em;
 }
 
+.version {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: -10px 0 14px;
+}
+
+.repo-link {
+    color: var(--text-muted);
+    text-decoration: underline;
+}
+
+.repo-link:hover {
+    color: var(--accent);
+}
+
 .notice {
     display: flex;
     align-items: center;
