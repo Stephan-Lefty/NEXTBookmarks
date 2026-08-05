@@ -1,4 +1,4 @@
-[Deutsch](README.md) | [English](README.en.md)
+[Deutsch](README.md) | [English](README.en.md) | [Änderungsprotokoll](#änderungsprotokoll)
 
 # NEXTBookmarks – Grundgerüst
 
