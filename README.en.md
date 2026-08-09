@@ -7,6 +7,10 @@ Nextcloud – independent of browser and operating system.
 
 This project was built in collaboration with [Claude](https://claude.com).
 
+**Install:**
+[Chrome Web Store](https://chromewebstore.google.com/detail/gkkfjlpedobidkhcihppighdomkjcihl) ·
+[Firefox Add-ons](https://addons.mozilla.org/firefox/addon/nextbookmarks/)
+
 ## How the two parts work together
 
 ```
@@ -184,7 +188,11 @@ The test instance runs completely isolated in Docker – it has nothing to do
 with your real Hetzner cloud, and you can remove it any time with
 `docker rm -f nextcloud-test`.
 
-## Loading the browser extension for testing
+## Loading the browser extension
+
+Easiest way: install directly from the store (see links above) – the
+Chrome Web Store listing also works in Vivaldi/Edge/Brave/Opera. For
+development, or to test a locally modified version:
 
 1. Chrome/Edge: open `chrome://extensions` → enable "Developer mode" →
    "Load unpacked" → select the `browser-extension` folder. The extension

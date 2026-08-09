@@ -7,6 +7,10 @@ synchron hält – unabhängig von Browser und Betriebssystem.
 
 Dieses Projekt ist in Zusammenarbeit mit [Claude](https://claude.com) entstanden.
 
+**Installation:**
+[Chrome Web Store](https://chromewebstore.google.com/detail/gkkfjlpedobidkhcihppighdomkjcihl) ·
+[Firefox Add-ons](https://addons.mozilla.org/firefox/addon/nextbookmarks/)
+
 ## Wie die beiden Teile zusammenspielen
 
 ```
@@ -193,7 +197,12 @@ Die Test-Instanz läuft komplett isoliert in Docker – sie hat nichts mit
 deiner echten Hetzner-Cloud zu tun, und du kannst sie jederzeit mit
 `docker rm -f nextcloud-test` wieder entfernen.
 
-## Browser-Extension zum Testen laden
+## Browser-Extension laden
+
+Am einfachsten direkt über den Store installieren (siehe Links oben) –
+bei Vivaldi/Edge/Brave/Opera funktioniert der Chrome-Web-Store-Eintrag
+ebenfalls. Für die Entwicklung bzw. um eine lokal geänderte Version zu
+testen:
 
 1. Chrome/Edge: `chrome://extensions` öffnen → "Entwicklermodus" aktivieren
    → "Entpackte Erweiterung laden" → Ordner `browser-extension` auswählen.
