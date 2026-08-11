@@ -184,8 +184,14 @@ async function ensureImportFolder(cache, rootId, path) {
 async function importBookmarksBackup(fileContent) {
     const items = parseBookmarksHtml(fileContent);
 
+    // Die Wurzelordner-IDs sind browserabhängig (Chrome: feste Zahlen wie
+    // '1', Firefox: eigene GUID-artige Strings) - nie hartkodieren, sonst
+    // schlägt das Anlegen in Firefox mit "Invalid bookmark" fehl.
+    const tree = await browser.bookmarks.getTree();
+    const toolbarFolderId = tree[0].children[0].id;
+
     const importRoot = await browser.bookmarks.create({
-        parentId: '1', // Lesezeichenleiste
+        parentId: toolbarFolderId,
         title: `NEXTBookmarks-Import ${new Date().toISOString().slice(0, 10)}`,
     });
 

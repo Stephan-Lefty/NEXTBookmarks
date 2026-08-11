@@ -377,6 +377,14 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
+### 0.1.3
+- Fehler behoben, der beim Sync auf einem frischen/leeren Firefox-Profil
+  zu "Invalid bookmark"-Fehlern führte: Die Wurzelordner-IDs
+  ("Lesezeichenleiste" o.ä.) waren mit Chrome-spezifischen, hartkodierten
+  Werten ('1'/'2') angenommen worden - Firefox verwendet dafür eigene,
+  andere ID-Strings. Werden jetzt browserabhängig live ermittelt statt
+  hartkodiert.
+
 ### 0.1.2
 - Popup zeigt jetzt die aktuell installierte Versionsnummer an.
 - Link zum GitHub-Repository im Popup ergänzt.
