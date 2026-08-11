@@ -359,6 +359,13 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
+### 0.1.3
+- Fixed a bug that caused "Invalid bookmark" errors when syncing to a
+  fresh/empty Firefox profile: root folder IDs (e.g. "Bookmarks Toolbar")
+  had been assumed with hardcoded, Chrome-specific values ('1'/'2') -
+  Firefox uses its own, different ID strings for these. Now resolved live
+  per browser instead of hardcoded.
+
 ### 0.1.2
 - The popup now shows the currently installed version number.
 - Added a link to the GitHub repository in the popup.

@@ -284,29 +284,37 @@ async function getLocalBookmarksFlat() {
 const folderIdCache = new Map();
 
 async function ensureLocalFolder(path) {
+    // Die IDs der Wurzelordner ("Lesezeichenleiste", "Andere Lesezeichen"
+    // o.ä.) sind browserabhängig - Chrome nutzt feste numerische IDs ('1',
+    // '2', ...), Firefox dagegen eigene GUID-artige Strings
+    // ("toolbar_____" usw.). Ein hartkodiertes '1' existiert in Firefox
+    // schlicht nicht und führt dort zu "Invalid bookmark"-Fehlern beim
+    // Anlegen. Deshalb die tatsächlichen Wurzelordner immer live abfragen.
+    const tree = await browser.bookmarks.getTree();
+    const rootChildren = tree[0].children;
+    const toolbarFolderId = rootChildren[0].id;
+    const otherFolderId = (rootChildren[1] || rootChildren[0]).id;
+
     if (!path) {
-        return '2'; // Chrome: "Andere Lesezeichen"; Firefox legt es an anderer Stelle ab
+        return otherFolderId;
     }
     if (folderIdCache.has(path)) return folderIdCache.get(path);
 
     const parts = path.split('/').filter(Boolean);
     let parentId = null;
     let currentPath = '';
-
-    const tree = await browser.bookmarks.getTree();
-    let currentNodes = tree[0].children;
+    let currentNodes = rootChildren;
 
     for (const part of parts) {
         currentPath = currentPath ? `${currentPath}/${part}` : part;
         let match = currentNodes.find(n => !n.url && n.title === part);
 
         if (!match) {
-            // '1' = Lesezeichenleiste. Kein Fallback auf die Wurzel ('0')
-            // verwenden - Chrome/Chromium verbieten das Anlegen von
-            // Einträgen direkt unter der Wurzel ("Can't modify the root
-            // bookmark folders.").
+            // Kein Fallback auf die Wurzel ('0'/root________) verwenden -
+            // Browser verbieten das Anlegen von Einträgen direkt unter der
+            // Wurzel ("Can't modify the root bookmark folders.").
             match = await browser.bookmarks.create({
-                parentId: parentId || '1',
+                parentId: parentId || toolbarFolderId,
                 title: part,
             });
         }
