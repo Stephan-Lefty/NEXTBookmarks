@@ -129,30 +129,20 @@ Server" on which you installed Nextcloud yourself).
 
 Many providers offer a **managed** Nextcloud instance (you only get a
 Nextcloud account, no server/SSH access). There, usually **only the official
-Nextcloud App Store** can be used via the web UI – custom, unpublished apps
-like this one can't simply be installed with a click.
+Nextcloud App Store** can be used via the web UI.
 
-**Easiest path in this case: choose the "WebDAV folder (no server app)"
-connection type** (see "Two connection types" above) – this also works with
-**Hetzner Storage Share** and other offerings with no SSH/root access
-whatsoever, since nothing needs to be installed on the server. Alternatively,
-here are ways to still use the App Store variant:
+**Good news: NEXTBookmarks has been listed in the official Nextcloud App
+Store since August 2026** –
+[apps.nextcloud.com/apps/nextbookmarks](https://apps.nextcloud.com/apps/nextbookmarks).
+On any Nextcloud (even managed, even **Hetzner Storage Share**) it's
+enough to search for "NEXTBookmarks" under Settings → Apps and click
+Enable – no SSH/root access, no SFTP, no provider support ticket needed.
 
-1. **Ask the provider**: Some hosting packages still include SFTP access to
-   the `apps/` folder, or support will install a custom app on request.
-   Worth a quick ask – if yes, just continue with the steps from section A.
-   *Exception: with **Hetzner Storage Share** this is explicitly excluded –
-   there is no SSH/root access at all, and only apps from the official
-   Nextcloud App Store can be enabled.*
-2. **Switch to your own (unmanaged) server**: e.g. rent a "Hetzner Cloud
-   Server" (VPS) instead of the managed Nextcloud product and install
-   Nextcloud there yourself – then section A applies again with full
-   access.
-3. **Publish in the official App Store**: For long-term, broader use, you
-   could submit NEXTBookmarks to [apps.nextcloud.com](https://apps.nextcloud.com)
-   (including code signing and review by Nextcloud). That's only worth it
-   once the app runs stably beyond testing – a step we can look at together
-   later if needed.
+Only if your provider disallows App Store apps for some other reason, or
+you simply don't want to install anything on the server at all, the
+**"WebDAV folder (no server app)"** connection type (see "Two connection
+types" above) remains available as an alternative that needs no
+server-side installation whatsoever.
 
 In all cases: once the app is active, just enter the Nextcloud URL, your
 username and an app password in the browser extension (see below) – the
@@ -358,6 +348,12 @@ test instance (see section C above) whether a change works:
 
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
+
+### 0.1.4
+- The "Nextcloud app (App Store)" connection type is selectable again in
+  the settings (no longer grayed out) - the Nextcloud app has been
+  officially listed in the Nextcloud App Store since August 2026:
+  [apps.nextcloud.com/apps/nextbookmarks](https://apps.nextcloud.com/apps/nextbookmarks).
 
 ### 0.1.3
 - Fixed a bug that caused "Invalid bookmark" errors when syncing to a

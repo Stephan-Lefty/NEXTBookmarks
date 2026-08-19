@@ -133,33 +133,21 @@ ein Raspberry Pi zuhause oder ein gemieteter, unverwalteter Server
 Viele Anbieter stellen eine **verwaltete** Nextcloud-Instanz bereit (du
 bekommst nur einen Nextcloud-Zugang, keinen Server-/SSH-Zugriff). Dort lässt
 sich normalerweise **nur der offizielle Nextcloud App Store** über die
-Weboberfläche nutzen – eigene, unveröffentlichte Apps wie diese hier lassen
-sich nicht einfach per Klick installieren.
+Weboberfläche nutzen.
 
-**Einfachster Weg in diesem Fall: die Verbindungsart "WebDAV-Ordner (ohne
-Server-App)" wählen** (siehe "Zwei Verbindungsarten" oben) – das
-funktioniert auch bei **Hetzner Storage Share** und anderen Angeboten ohne
-jeglichen SSH-/Root-Zugriff, weil dabei nichts auf dem Server installiert
-werden muss. Alternativ gibt es diese Wege, um trotzdem die App-Store-Variante
-nutzen zu können:
+**Gute Nachricht: NEXTBookmarks ist seit August 2026 im offiziellen
+Nextcloud App Store gelistet** –
+[apps.nextcloud.com/apps/nextbookmarks](https://apps.nextcloud.com/apps/nextbookmarks).
+Auf jeder Nextcloud (auch verwaltet, auch bei **Hetzner Storage Share**)
+reicht es also, unter Einstellungen → Apps nach "NEXTBookmarks" zu suchen
+und auf Aktivieren zu klicken – kein SSH-/Root-Zugriff, kein SFTP, kein
+Anbieter-Support-Ticket nötig.
 
-1. **Beim Anbieter nachfragen**: Manche Hosting-Pakete enthalten trotzdem
-   SFTP-Zugriff auf den `apps/`-Ordner, oder der Support installiert eine
-   eigene App auf Anfrage. Kurz beim Anbieter nachfragen lohnt sich – falls
-   ja, einfach mit den Schritten aus Bereich A weitermachen.
-   *Ausnahme: Bei **Hetzner Storage Share** ist das explizit ausgeschlossen
-   – dort gibt es keinerlei SSH-/Root-Zugriff und es lassen sich nur Apps
-   aus dem offiziellen Nextcloud App Store aktivieren.*
-2. **Auf einen eigenen (unverwalteten) Server wechseln**: z.B. einen
-   "Hetzner Cloud Server" (VPS) statt des Managed-Nextcloud-Produkts mieten
-   und Nextcloud dort selbst installieren – dann greift wieder Bereich A
-   mit vollem Zugriff.
-3. **App im offiziellen App Store veröffentlichen**: Für den dauerhaften,
-   breiteren Einsatz könnte man NEXTBookmarks bei
-   [apps.nextcloud.com](https://apps.nextcloud.com) einreichen (inkl.
-   Code-Signierung und Review durch Nextcloud). Das lohnt sich erst, wenn
-   die App über das Testen hinaus stabil laufen soll – ein Schritt, den wir
-   uns bei Bedarf später gemeinsam anschauen können.
+Nur falls dein Anbieter aus anderen Gründen keine App-Store-Apps erlaubt,
+oder du gar keine App auf dem Server installieren möchtest, bleibt die
+Verbindungsart **"WebDAV-Ordner (ohne Server-App)"** (siehe "Zwei
+Verbindungsarten" oben) als Alternative, die komplett ohne
+Server-Installation auskommt.
 
 In allen Fällen gilt: Sobald die App aktiv ist, richtest du in der
 Browser-Extension einfach die Nextcloud-URL, deinen Benutzernamen und ein
@@ -376,6 +364,12 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
+
+### 0.1.4
+- Verbindungsart "Nextcloud-App (App Store)" ist in den Einstellungen
+  wieder auswählbar (nicht mehr ausgegraut) - die Nextcloud-App ist seit
+  August 2026 offiziell im Nextcloud App Store gelistet:
+  [apps.nextcloud.com/apps/nextbookmarks](https://apps.nextcloud.com/apps/nextbookmarks).
 
 ### 0.1.3
 - Fehler behoben, der beim Sync auf einem frischen/leeren Firefox-Profil
