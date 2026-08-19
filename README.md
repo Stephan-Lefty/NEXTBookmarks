@@ -427,4 +427,7 @@ Browser-Erweiterung.
 
 ## Lizenz
 
-MIT, siehe [LICENSE](LICENSE).
+Der Großteil des Repositories (u.a. `browser-extension/`) steht unter MIT,
+siehe [LICENSE](LICENSE). Die Nextcloud-App (`nextcloud-app/`) steht
+separat unter AGPL-3.0-or-later, passend zum Nextcloud-Ökosystem, siehe
+[nextcloud-app/LICENSE](nextcloud-app/LICENSE).

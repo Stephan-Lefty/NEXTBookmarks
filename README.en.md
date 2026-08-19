@@ -409,4 +409,7 @@ policy.
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+Most of the repository (including `browser-extension/`) is MIT-licensed,
+see [LICENSE](LICENSE). The Nextcloud app (`nextcloud-app/`) is separately
+licensed under AGPL-3.0-or-later, matching the Nextcloud ecosystem, see
+[nextcloud-app/LICENSE](nextcloud-app/LICENSE).
