@@ -61,9 +61,6 @@
     "optionsSyncModeWebdavHint": {
         "message": "Speichert alle Lesezeichen als eine Datei im Ordner \"NEXTBookmarks\" in deinen Nextcloud-Dateien. Funktioniert auf jeder Nextcloud, auch ohne installierte Apps (z.B. bei eingeschränkten Hosting-Paketen) - keine Übersicht innerhalb von Nextcloud."
     },
-    "optionsSyncModeRestWarning": {
-        "message": "Noch nicht als Nextcloud-App im Store freigegeben!"
-    },
     "errorWebdavConflict": {
         "message": "Ein anderes Gerät hat die Lesezeichen-Datei gerade gleichzeitig geändert. Bitte in Kürze erneut synchronisieren."
     },
