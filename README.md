@@ -365,6 +365,19 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
+### 0.1.5
+- Kritischer Fehler behoben: Der Sync-Zustand (`syncState`) wurde nur pro
+  Server+Konto getrennt gespeichert, nicht zusätzlich pro Verbindungsart.
+  Beim Wechsel von WebDAV zu Nextcloud-App (oder umgekehrt) auf demselben
+  Server/Konto führte das dazu, dass der alte Sync-Zustand fälschlich auf
+  die neue, noch leere Verbindungsart angewendet wurde - das
+  Sicherheitsnetz gegen Massenlöschung schlug dadurch zu Recht Alarm
+  ("Sicherheitsabbruch: X von X bekannten Lesezeichen würden gelöscht").
+  Sync-Zustand, "erster Sync erledigt"-Merker und übersprungene
+  Lesezeichen sind jetzt zusätzlich nach Verbindungsart getrennt - ein
+  Wechsel der Verbindungsart startet dadurch sauber mit einem neuen,
+  unbelasteten Zustand statt mit fälschlich übernommenen alten Daten.
+
 ### 0.1.4
 - Verbindungsart "Nextcloud-App (App Store)" ist in den Einstellungen
   wieder auswählbar (nicht mehr ausgegraut) - die Nextcloud-App ist seit

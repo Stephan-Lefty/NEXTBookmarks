@@ -333,17 +333,26 @@ async function createLocalBookmark({ url, title, folder }) {
 
 // ---- Sync-Status (letzter bekannter Stand pro lokaler Browser-ID) -----
 
-// Der Sync-Zustand wird pro Server+Konto getrennt gespeichert (nicht
-// unter einem einzigen festen Schlüssel). Sonst würde ein Wechsel der
-// Nextcloud-URL/des Benutzernamens (z.B. von einer Test- auf die
-// produktive Instanz) den alten Zustand einer komplett anderen Cloud
-// weiterverwenden - und Schritt 1 von syncBookmarks() würde jedes lokal
-// bekannte Lesezeichen als "auf dem (neuen) Server gelöscht" ansehen und
-// es prompt auch lokal löschen. Mit einem eigenen Schlüssel pro Profil
-// startet ein Wechsel zu einem neuen/anderen Server dagegen mit einem
-// leeren, unbelasteten Zustand.
+// Der Sync-Zustand wird pro Server+Konto+Verbindungsart getrennt
+// gespeichert (nicht unter einem einzigen festen Schlüssel). Sonst würde
+// ein Wechsel der Nextcloud-URL/des Benutzernamens (z.B. von einer Test-
+// auf die produktive Instanz) den alten Zustand einer komplett anderen
+// Cloud weiterverwenden - und Schritt 1 von syncBookmarks() würde jedes
+// lokal bekannte Lesezeichen als "auf dem (neuen) Server gelöscht"
+// ansehen und es prompt auch lokal löschen. Mit einem eigenen Schlüssel
+// pro Profil startet ein Wechsel zu einem neuen/anderen Server dagegen
+// mit einem leeren, unbelasteten Zustand.
+//
+// Die Verbindungsart gehört ebenfalls in den Schlüssel: REST-API (eigene
+// Datenbanktabelle der Nextcloud-App) und WebDAV-Datei sind zwei
+// vollständig getrennte Speicherorte auf demselben Server/Konto. Ohne
+// diese Trennung würde ein Wechsel von WebDAV auf REST (oder umgekehrt)
+// denselben Fehler auslösen wie ein Server-Wechsel: Der alte Sync-Zustand
+// kennt hunderte Lesezeichen, die neue Verbindungsart hat aber noch gar
+// keine - der Sicherheitsabbruch (siehe runSync()) greift dann zu Recht,
+// weil es sonst wie eine Massenlöschung aussähe.
 function profileStorageKey(settings, baseName) {
-    return `${baseName}::${settings.serverUrl}::${settings.username}`;
+    return `${baseName}::${settings.serverUrl}::${settings.username}::${settings.syncMode}`;
 }
 
 async function loadSyncState(settings) {
