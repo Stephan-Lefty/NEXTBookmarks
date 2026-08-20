@@ -365,20 +365,6 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
-### 0.1.6
-- Onboarding-Dialog (nach dem Speichern der Zugangsdaten) neu gestaltet:
-  statt einer einzigen, auf einem frischen/leeren Browser missverständlichen
-  Frage ("Sollen deine 0 Lesezeichen importiert werden?") jetzt zwei klare,
-  nacheinander gestellte Fragen - zuerst "Lesezeichen aus der Cloud
-  importieren?", bei "Nein" danach "Lesezeichen aus diesem Browser in die
-  Cloud hochladen?". Behebt, dass auf einem zweiten/neuen Rechner ohne
-  vorhandene lokale Lesezeichen leicht versehentlich "Nein" geklickt wurde
-  und dadurch gar kein Sync (und damit auch kein Download der
-  Cloud-Lesezeichen) stattfand.
-- Die Liste übersprungener Lesezeichen (`skippedUrls`) wird jetzt ebenfalls
-  nach Verbindungsart getrennt gespeichert (dieselbe Korrektur wie beim
-  Sync-Zustand in 0.1.5, war für diese Liste noch nicht mit angepasst).
-
 ### 0.1.5
 - Kritischer Fehler behoben: Der Sync-Zustand (`syncState`) wurde nur pro
   Server+Konto getrennt gespeichert, nicht zusätzlich pro Verbindungsart.
@@ -391,6 +377,17 @@ Bezieht sich auf die Versionsnummer der Browser-Erweiterung
   Lesezeichen sind jetzt zusätzlich nach Verbindungsart getrennt - ein
   Wechsel der Verbindungsart startet dadurch sauber mit einem neuen,
   unbelasteten Zustand statt mit fälschlich übernommenen alten Daten.
+  Die Liste übersprungener Lesezeichen (`skippedUrls`) war davon zunächst
+  nicht mit erfasst, ist aber ebenfalls korrigiert.
+- Onboarding-Dialog (nach dem Speichern der Zugangsdaten) neu gestaltet:
+  statt einer einzigen, auf einem frischen/leeren Browser missverständlichen
+  Frage ("Sollen deine 0 Lesezeichen importiert werden?") jetzt zwei klare,
+  nacheinander gestellte Fragen - zuerst "Lesezeichen aus der Cloud
+  importieren?", bei "Nein" danach "Lesezeichen aus diesem Browser in die
+  Cloud hochladen?". Behebt, dass auf einem zweiten/neuen Rechner ohne
+  vorhandene lokale Lesezeichen leicht versehentlich "Nein" geklickt wurde
+  und dadurch gar kein Sync (und damit auch kein Download der
+  Cloud-Lesezeichen) stattfand.
 
 ### 0.1.4
 - Verbindungsart "Nextcloud-App (App Store)" ist in den Einstellungen

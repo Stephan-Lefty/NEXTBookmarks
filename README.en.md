@@ -349,20 +349,6 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
-### 0.1.6
-- Redesigned the onboarding dialog (shown after saving credentials):
-  instead of a single question that's confusing on a fresh/empty browser
-  ("Should your 0 bookmarks be imported?"), it now asks two clear
-  questions in sequence - first "Import bookmarks from the cloud?", and
-  if answered "No", then "Upload bookmarks from this browser to the
-  cloud?". Fixes an issue where, on a second/new computer with no local
-  bookmarks yet, it was easy to accidentally click "No" and end up with no
-  sync (and therefore no download of the cloud bookmarks) happening at
-  all.
-- The list of skipped bookmarks (`skippedUrls`) is now also scoped by
-  connection type (same fix as the sync state fix in 0.1.5, which hadn't
-  been applied to this list yet).
-
 ### 0.1.5
 - Fixed a critical bug: sync state (`syncState`) was only scoped per
   server+account, not additionally per connection type. Switching from
@@ -373,7 +359,18 @@ Refers to the browser extension's version number
   be deleted"). Sync state, the "first sync done" flag, and skipped
   bookmarks are now additionally scoped by connection type - switching
   connection types now cleanly starts with a fresh, unburdened state
-  instead of wrongly inheriting old data.
+  instead of wrongly inheriting old data. The skipped-bookmarks list
+  (`skippedUrls`) wasn't caught by this fix initially, but has since been
+  corrected too.
+- Redesigned the onboarding dialog (shown after saving credentials):
+  instead of a single question that's confusing on a fresh/empty browser
+  ("Should your 0 bookmarks be imported?"), it now asks two clear
+  questions in sequence - first "Import bookmarks from the cloud?", and
+  if answered "No", then "Upload bookmarks from this browser to the
+  cloud?". Fixes an issue where, on a second/new computer with no local
+  bookmarks yet, it was easy to accidentally click "No" and end up with no
+  sync (and therefore no download of the cloud bookmarks) happening at
+  all.
 
 ### 0.1.4
 - The "Nextcloud app (App Store)" connection type is selectable again in
