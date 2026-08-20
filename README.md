@@ -365,6 +365,21 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
+### 0.1.8
+- Ursache der Ordnerpfad-Dopplungen (siehe 0.1.6) direkt behoben statt nur
+  abgefangen: Der Name des browserspezifischen Wurzelordners
+  ("Lesezeichenleiste", "Andere Lesezeichen", in Firefox z.B.
+  "Lesezeichen-Menü") ist jetzt nicht mehr Teil des gespeicherten
+  Ordnerpfads - nur was darunter liegt (z.B. "Schnellwahl/Gruppenname")
+  wird synchronisiert. Beim Herunterladen landet das automatisch im
+  jeweils eigenen Wurzelordner des Zielbrowsers. Dadurch kann der
+  Textvergleich der Ordnerpfade beim erneuten Sync nie mehr an
+  unterschiedlichen Wurzelordner-Namen zwischen Browsern scheitern - die
+  in 0.1.6 ergänzte URL-Rückfallsuche bleibt zusätzlich als
+  Sicherheitsnetz bestehen. Live per Playwright verifiziert (inkl.
+  Round-Trip-Test: Herunterladen landet korrekt im Wurzelordner des
+  jeweiligen Browsers).
+
 ### 0.1.7
 - Neue "Gefahrenzone" in den Einstellungen: Button "Alle lokalen
   Lesezeichen löschen" (mit Sicherheitsabfrage). Gedacht für den Einsatz

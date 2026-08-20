@@ -250,10 +250,20 @@ function getBackend(settings) {
 // ---- Lokale Lesezeichen lesen & schreiben (inkl. Ordner-Pfad) --------
 
 // Baut aus dem Lesezeichen-Baum eine flache Liste, inkl. Ordner-Pfad
-// (z.B. "Lesezeichenleiste/Arbeit") und der internen Browser-ID.
+// (z.B. "Arbeit/Projekte") und der internen Browser-ID.
 // "position" ist ein fortlaufender Zähler in der Reihenfolge, in der der
 // Baum durchlaufen wird - das entspricht der tatsächlichen Anzeige-
 // Reihenfolge im Browser (Ordner für Ordner, von oben nach unten).
+//
+// Der browserspezifische Wurzelordner ("Lesezeichenleiste", "Andere
+// Lesezeichen", in Firefox z.B. "Lesezeichen-Menü" o.ä.) wird bewusst NICHT
+// Teil des gespeicherten Pfads - diese Namen unterscheiden sich zwischen
+// Browsern und teils auch nach Sprache, und ein reiner Textvergleich würde
+// sonst beim Sync zwischen unterschiedlichen Browsern fehlschlagen (das
+// war die Ursache für doppelt angelegte Lesezeichen). Nur was UNTERHALB
+// des Wurzelordners liegt, wird als Pfad gespeichert - beim Herunterladen
+// landet das dann automatisch im jeweils eigenen Wurzelordner des
+// Zielbrowsers (siehe ensureLocalFolder()).
 async function getLocalBookmarksFlat() {
     const tree = await browser.bookmarks.getTree();
     const flat = [];
@@ -270,12 +280,13 @@ async function getLocalBookmarksFlat() {
                     position: position++,
                 });
             } else if (node.children) {
-                const nextPath = node.title ? [...pathParts, node.title] : pathParts;
-                walk(node.children, nextPath);
+                walk(node.children, [...pathParts, node.title].filter(Boolean));
             }
         }
     }
-    walk(tree, []);
+    for (const root of tree[0].children) {
+        walk(root.children || [], []);
+    }
     return flat;
 }
 

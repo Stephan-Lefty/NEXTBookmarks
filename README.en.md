@@ -349,6 +349,19 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
+### 0.1.8
+- Fixed the root cause of the folder-path duplication issue (see 0.1.6)
+  instead of just catching it: the browser-specific root folder's name
+  ("Bookmarks bar", "Other bookmarks", or e.g. "Bookmarks Menu" in
+  Firefox) is no longer part of the stored folder path - only what's
+  below it (e.g. "Speed Dial/GroupName") gets synced. When downloading,
+  it's automatically placed inside the target browser's own root folder.
+  This means the folder-path text comparison can no longer fail due to
+  browsers naming their root folders differently - the URL fallback
+  search added in 0.1.6 remains in place as an additional safety net.
+  Verified live in Playwright (including a round-trip test: downloading
+  correctly lands inside each browser's own root folder).
+
 ### 0.1.7
 - New "Danger zone" in settings: "Delete all local bookmarks" button
   (with a confirmation prompt). Meant to be used right after a fresh
