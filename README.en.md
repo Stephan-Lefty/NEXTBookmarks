@@ -349,6 +349,13 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
+### 0.1.8
+- The settings window is now explicitly brought to the front. If it's
+  already open, clicking "Settings" again focuses that window instead of
+  opening a second one next to it. A true "always on top" isn't possible
+  through the extension API - that's up to the operating system's window
+  manager.
+
 ### 0.1.7
 - **Fixed (data loss): after "Delete all local bookmarks", the next sync
   wiped the cloud.** The stored sync state survived the deletion, so the
