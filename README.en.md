@@ -350,12 +350,14 @@ Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
 ### 0.1.9
-- New setting "Folder name to skip during sync": a folder with exactly
-  this name is skipped when syncing (its contents end up one level
-  higher), regardless of which level it appears at - e.g. "Speed Dial" on
-  Vivaldi, so its groups land directly in the root folder instead of in
-  an extra intermediate folder. Only affects folders with exactly this
-  name, not a fixed level in general.
+- New setting "Folder to skip during sync": a top-level folder (directly
+  under a root folder) with this name is skipped when syncing - its
+  contents end up directly in the root folder instead. Handy for
+  Vivaldi's "Speed Dial" folder, so its groups don't end up in an extra
+  intermediate folder. Picked from a dropdown instead of typed as free
+  text (only lists this browser's actual top-level folder names, so no
+  typos are possible), and deliberately only applies at the top level -
+  a same-named but unrelated folder deeper in the tree stays untouched.
 - New "Delete cloud data and re-upload from this browser" button in the
   danger zone: a repair tool for when the cloud side has gotten messy
   from earlier sync bugs (nested/duplicate folders etc.) - deletes all

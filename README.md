@@ -366,12 +366,15 @@ Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
 ### 0.1.9
-- Neue Einstellung "Ordnername beim Sync überspringen": Ein Ordner mit
-  genau diesem Namen wird beim Synchronisieren übersprungen (sein Inhalt
-  landet eine Ebene höher), egal auf welcher Ebene er vorkommt - z.B.
-  "Schnellwahl" bei Vivaldi, damit dessen Gruppen direkt im Wurzelordner
-  landen statt in einem zusätzlichen Zwischenordner. Betrifft gezielt nur
-  Ordner mit exakt diesem Namen, nicht pauschal eine bestimmte Ebene.
+- Neue Einstellung "Ordner beim Sync überspringen": Ein oberster Ordner
+  (direkt unter einem Wurzelordner) mit diesem Namen wird beim
+  Synchronisieren übersprungen - sein Inhalt landet dann direkt im
+  Wurzelordner. Praktisch für Vivaldis "Schnellwahl"-Ordner, damit dessen
+  Gruppen nicht in einem zusätzlichen Zwischenordner landen. Auswahl per
+  Dropdown statt Freitext (zeigt nur tatsächlich vorhandene oberste
+  Ordnernamen dieses Browsers, kein Tippfehler möglich), und greift
+  bewusst nur auf der obersten Ebene - ein gleichnamiger, aber
+  inhaltlich unabhängiger Ordner tiefer im Baum bleibt unangetastet.
 - Neuer Button "Cloud-Daten löschen und von diesem Browser neu hochladen"
   in der Gefahrenzone: Reparatur-Werkzeug für den Fall, dass die Cloud-
   Seite durch frühere Sync-Fehler durcheinandergeraten ist (verschachtelte/
