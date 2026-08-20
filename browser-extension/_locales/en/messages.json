@@ -160,6 +160,16 @@
             "count": { "content": "$1" }
         }
     },
+    "optionsDeleteAllBookmarksDoneWithSkippedStatus": {
+        "message": "$count$ bookmarks/folders deleted, $skipped$ skipped (protected by the browser).",
+        "placeholders": {
+            "count": { "content": "$1" },
+            "skipped": { "content": "$2" }
+        }
+    },
+    "optionsDangerConfirmAgainButton": {
+        "message": "Click again to confirm"
+    },
     "optionsResetCloudDescription": {
         "message": "If the cloud data has gotten messy (e.g. nested/duplicate folders from earlier sync bugs): deletes ALL bookmarks on the server (for the currently selected connection type) and then re-uploads this browser's bookmarks completely fresh - this browser becomes the sole source of truth."
     },

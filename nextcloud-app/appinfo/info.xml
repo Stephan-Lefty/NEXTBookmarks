@@ -7,7 +7,7 @@
     <summary lang="de">Browser- und OS-unabhängige Lesezeichen-Synchronisation</summary>
     <description>Stores bookmarks centrally in Nextcloud and synchronizes them via a REST API with a browser extension.</description>
     <description lang="de">Speichert Lesezeichen zentral in Nextcloud und synchronisiert sie über eine REST-API mit einer Browser-Extension.</description>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <licence>agpl</licence>
     <author>Stephan-Lefty</author>
     <namespace>Nextbookmarks</namespace>

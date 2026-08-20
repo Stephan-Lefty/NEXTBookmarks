@@ -9,6 +9,22 @@
     color: var(--color-main-text, #222);
 }
 
+/* Gemeinsame Fläche für Überschrift und Liste: Viele Nextcloud-Themes
+   zeigen ein Hintergrundbild, auf dem Text ohne eigenen Hintergrund kaum
+   zu lesen ist. "--color-main-background-blur" ist genau dafür gedacht
+   (leicht durchscheinend, passend zum aktiven Theme); der zugehörige
+   Weichzeichner lässt das Hintergrundbild dezent durchschimmern, ohne den
+   Text zu stören. Fallback für ältere Nextcloud-Versionen bzw. Browser
+   ohne backdrop-filter: der normale, deckende Hintergrund. */
+.nextbookmarks-card {
+    max-width: 900px;
+    padding: 16px 24px 24px;
+    background-color: var(--color-main-background-blur, var(--color-main-background, #fff));
+    -webkit-backdrop-filter: var(--filter-background-blur, blur(25px));
+    backdrop-filter: var(--filter-background-blur, blur(25px));
+    border-radius: var(--border-radius-large, 12px);
+}
+
 #bookmark-list {
     list-style: none;
     margin: 0;
@@ -25,6 +41,10 @@
     border-bottom: 1px solid var(--color-border, #ddd);
     font-weight: bold;
     font-size: inherit;
+    /* Buttons erben die Textfarbe nicht automatisch - ohne diese Angabe
+       nähmen sie die Standardfarbe des Browsers und würden im dunklen
+       Theme unlesbar. */
+    color: var(--color-main-text, #222);
     cursor: pointer;
 }
 
@@ -39,9 +59,15 @@
 }
 
 .folder-bookmarks a {
-    color: var(--color-main-text, #222);
+    /* Die URL steht neben dem (fett gesetzten) Titel und soll ihn nicht
+       überstrahlen - daher bewusst zurückgenommen, aber weiterhin mit
+       ausreichendem Kontrast (dafür ist diese Nextcloud-Variable da). */
+    color: var(--color-text-maxcontrast, #6b6b6b);
+    text-decoration: none;
 }
 
-.folder-bookmarks a:hover {
+.folder-bookmarks a:hover,
+.folder-bookmarks a:focus {
     color: var(--color-primary-element, #0082c9);
+    text-decoration: underline;
 }

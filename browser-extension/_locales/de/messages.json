@@ -160,6 +160,16 @@
             "count": { "content": "$1" }
         }
     },
+    "optionsDeleteAllBookmarksDoneWithSkippedStatus": {
+        "message": "$count$ Lesezeichen/Ordner gelöscht, $skipped$ übersprungen (vom Browser geschützt).",
+        "placeholders": {
+            "count": { "content": "$1" },
+            "skipped": { "content": "$2" }
+        }
+    },
+    "optionsDangerConfirmAgainButton": {
+        "message": "Zur Bestätigung erneut klicken"
+    },
     "optionsResetCloudDescription": {
         "message": "Falls die Cloud-Daten durcheinandergeraten sind (z.B. verschachtelte/doppelte Ordner durch frühere Sync-Fehler): Löscht ALLE Lesezeichen auf dem Server (für die aktuell gewählte Verbindungsart) und lädt danach die Lesezeichen dieses Browsers komplett neu hoch - dieser Browser wird damit zur alleinigen Quelle der Wahrheit."
     },
