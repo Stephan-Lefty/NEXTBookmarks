@@ -130,6 +130,27 @@
             "count": { "content": "$1" }
         }
     },
+    "optionsDangerZoneHeading": {
+        "message": "Danger zone"
+    },
+    "optionsDeleteAllBookmarksDescription": {
+        "message": "Handy right after a fresh browser install: removes all default bookmarks before your first sync, so they don't end up permanently in your cloud by accident."
+    },
+    "optionsDeleteAllBookmarksButton": {
+        "message": "Delete all local bookmarks"
+    },
+    "optionsDeleteAllBookmarksConfirm": {
+        "message": "Really delete ALL bookmarks in this browser irreversibly? This cannot be undone - use \"Export backup\" first if needed."
+    },
+    "optionsDeleteAllBookmarksInProgress": {
+        "message": "Deleting…"
+    },
+    "optionsDeleteAllBookmarksDoneStatus": {
+        "message": "$count$ bookmarks/folders deleted.",
+        "placeholders": {
+            "count": { "content": "$1" }
+        }
+    },
     "statusImporting": {
         "message": "Importing…"
     },

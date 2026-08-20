@@ -115,6 +115,31 @@ document.getElementById('importBackupFile').addEventListener('change', async (ev
     backupStatusEl.textContent = chrome.i18n.getMessage('optionsBackupImportDoneStatus', [String(imported)]);
 });
 
+// Alle lokalen Lesezeichen löschen - gedacht für den Einsatz direkt nach
+// einer Neuinstallation des Browsers, bevor zum ersten Mal synchronisiert
+// wird: Ohne das würden die vom Browser mitgelieferten Standard-
+// Lesezeichen sonst dauerhaft mit in die Cloud hochgeladen.
+document.getElementById('deleteAllBookmarks').addEventListener('click', async () => {
+    if (!confirm(chrome.i18n.getMessage('optionsDeleteAllBookmarksConfirm'))) return;
+
+    const statusEl = document.getElementById('deleteAllStatus');
+    statusEl.textContent = chrome.i18n.getMessage('optionsDeleteAllBookmarksInProgress');
+
+    // Die Wurzelordner selbst ("Lesezeichenleiste", "Andere Lesezeichen"
+    // usw.) lassen sich nicht löschen ("Can't modify the root bookmark
+    // folders") - nur ihr Inhalt.
+    const tree = await browser.bookmarks.getTree();
+    let count = 0;
+    for (const root of tree[0].children) {
+        for (const child of root.children || []) {
+            await browser.bookmarks.removeTree(child.id);
+            count++;
+        }
+    }
+
+    statusEl.textContent = chrome.i18n.getMessage('optionsDeleteAllBookmarksDoneStatus', [String(count)]);
+});
+
 // Passt die Fenstergröße nach dem Laden automatisch an den tatsächlichen
 // Inhalt an, statt sich auf fest verdrahtete Pixelwerte in popup.js zu
 // verlassen. Dadurch muss die Größe nicht mehr von Hand nachjustiert

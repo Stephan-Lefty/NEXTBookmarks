@@ -349,6 +349,13 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
+### 0.1.7
+- New "Danger zone" in settings: "Delete all local bookmarks" button
+  (with a confirmation prompt). Meant to be used right after a fresh
+  browser install, before syncing for the first time - prevents the
+  browser's default bookmarks from accidentally being permanently
+  uploaded to the cloud.
+
 ### 0.1.6
 - Fixed a performance regression: when downloading/creating local
   bookmarks, `ensureLocalFolder()` called `browser.bookmarks.getTree()`
