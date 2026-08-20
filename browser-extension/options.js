@@ -147,29 +147,82 @@ document.getElementById('importBackupFile').addEventListener('change', async (ev
     backupStatusEl.textContent = chrome.i18n.getMessage('optionsBackupImportDoneStatus', [String(imported)]);
 });
 
+// Sicherheitsabfrage für die Aktionen in der Gefahrenzone.
+//
+// Bewusst KEIN window.confirm(): Firefox zeigt solche modalen Dialoge in
+// Erweiterungs-Fenstern nicht zuverlässig an - der Klick lief dort
+// stillschweigend ins Leere, ohne Nachfrage und ohne Wirkung. Diese
+// Variante fragt stattdessen direkt in der Seite nach: Der erste Klick
+// zeigt die Warnung an und "schärft" den Button, erst der zweite Klick
+// führt die Aktion aus. Passiert 10 Sekunden lang nichts, wird der
+// Button wieder entschärft, damit er nicht dauerhaft scharf bleibt.
+function setupDangerButton(buttonId, statusId, confirmMessageKey, action) {
+    const button = document.getElementById(buttonId);
+    const statusEl = document.getElementById(statusId);
+    const originalLabel = () => chrome.i18n.getMessage(button.dataset.i18n);
+    let armed = false;
+    let disarmTimer = null;
+
+    function disarm() {
+        clearTimeout(disarmTimer);
+        armed = false;
+        button.textContent = originalLabel();
+    }
+
+    button.addEventListener('click', async () => {
+        if (!armed) {
+            armed = true;
+            button.textContent = chrome.i18n.getMessage('optionsDangerConfirmAgainButton');
+            statusEl.textContent = chrome.i18n.getMessage(confirmMessageKey);
+            disarmTimer = setTimeout(() => {
+                disarm();
+                statusEl.textContent = '';
+            }, 10000);
+            return;
+        }
+
+        disarm();
+        try {
+            await action(statusEl);
+        } catch (err) {
+            // Ohne diese Anzeige würde ein Fehler (z.B. ein vom Browser
+            // geschützter Ordner) nur stillschweigend in der Konsole landen.
+            statusEl.textContent = chrome.i18n.getMessage('genericError', [err?.message || chrome.i18n.getMessage('errorUnknown')]);
+        }
+    });
+}
+
 // Alle lokalen Lesezeichen löschen - gedacht für den Einsatz direkt nach
 // einer Neuinstallation des Browsers, bevor zum ersten Mal synchronisiert
 // wird: Ohne das würden die vom Browser mitgelieferten Standard-
 // Lesezeichen sonst dauerhaft mit in die Cloud hochgeladen.
-document.getElementById('deleteAllBookmarks').addEventListener('click', async () => {
-    if (!confirm(chrome.i18n.getMessage('optionsDeleteAllBookmarksConfirm'))) return;
-
-    const statusEl = document.getElementById('deleteAllStatus');
+setupDangerButton('deleteAllBookmarks', 'deleteAllStatus', 'optionsDeleteAllBookmarksConfirm', async (statusEl) => {
     statusEl.textContent = chrome.i18n.getMessage('optionsDeleteAllBookmarksInProgress');
 
     // Die Wurzelordner selbst ("Lesezeichenleiste", "Andere Lesezeichen"
     // usw.) lassen sich nicht löschen ("Can't modify the root bookmark
-    // folders") - nur ihr Inhalt.
+    // folders") - nur ihr Inhalt. Firefox hat zusätzlich unveränderliche
+    // Sonderordner (z.B. den Tags-Bereich): Schlägt das Löschen eines
+    // einzelnen Eintrags fehl, wird er übersprungen, statt den ganzen
+    // Vorgang abzubrechen.
     const tree = await browser.bookmarks.getTree();
     let count = 0;
+    let skipped = 0;
     for (const root of tree[0].children) {
         for (const child of root.children || []) {
-            await browser.bookmarks.removeTree(child.id);
-            count++;
+            try {
+                await browser.bookmarks.removeTree(child.id);
+                count++;
+            } catch (err) {
+                console.warn('Lesezeichen-Ordner konnte nicht gelöscht werden:', child.title, err);
+                skipped++;
+            }
         }
     }
 
-    statusEl.textContent = chrome.i18n.getMessage('optionsDeleteAllBookmarksDoneStatus', [String(count)]);
+    statusEl.textContent = skipped
+        ? chrome.i18n.getMessage('optionsDeleteAllBookmarksDoneWithSkippedStatus', [String(count), String(skipped)])
+        : chrome.i18n.getMessage('optionsDeleteAllBookmarksDoneStatus', [String(count)]);
 });
 
 // Zwischenmeldung vom Hintergrundprozess: Die Cloud ist geleert, das
@@ -185,10 +238,7 @@ browser.runtime.onMessage.addListener((message) => {
 // Cloud-Daten komplett zurücksetzen und durch die Lesezeichen dieses
 // Browsers ersetzen - gedacht als Reparatur-Werkzeug, falls die Cloud-
 // Seite durch frühere Sync-Fehler durcheinandergeraten ist.
-document.getElementById('resetCloud').addEventListener('click', async () => {
-    if (!confirm(chrome.i18n.getMessage('optionsResetCloudConfirm'))) return;
-
-    const statusEl = document.getElementById('resetCloudStatus');
+setupDangerButton('resetCloud', 'resetCloudStatus', 'optionsResetCloudConfirm', async (statusEl) => {
     statusEl.textContent = chrome.i18n.getMessage('optionsResetCloudInProgress');
 
     const result = await browser.runtime.sendMessage({ action: 'resetCloud' });

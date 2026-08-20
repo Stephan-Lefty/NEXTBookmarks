@@ -350,6 +350,20 @@ Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
 ### 0.1.7
+- **Fixed: "Delete all local bookmarks" did nothing on Firefox.** The
+  confirmation used the browser's built-in dialog (`window.confirm`),
+  which Firefox doesn't reliably show inside extension windows - so the
+  click silently had no effect. The confirmation now happens inside the
+  page itself: the first click shows the warning and arms the button, the
+  second click performs the action (the button disarms itself again after
+  10 seconds without confirmation). Applies to both danger-zone actions.
+- When deleting all local bookmarks, folders protected by the browser are
+  now skipped instead of aborting the whole run, and errors are shown in
+  the UI instead of only appearing in the console.
+- **Nextcloud app 0.1.2**: bookmarks in the Nextcloud web UI were hard to
+  read with themes that use a background image - the heading and list now
+  sit together on their own surface with a matching background (light and
+  dark), and URLs are visually distinguished from titles.
 - **Much faster resetting and uploading**: deleting cloud data and
   uploading new bookmarks used to send one request after another - with
   ~300 bookmarks, a full "reset cloud" run therefore took several

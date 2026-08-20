@@ -366,6 +366,22 @@ Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
 ### 0.1.7
+- **Behoben: "Alle lokalen Lesezeichen löschen" reagierte in Firefox
+  nicht.** Die Sicherheitsabfrage lief bisher über den eingebauten
+  Bestätigungsdialog des Browsers (`window.confirm`) - den zeigt Firefox
+  in Erweiterungs-Fenstern nicht zuverlässig an, wodurch der Klick
+  wirkungslos blieb. Die Abfrage passiert jetzt direkt in der Seite: Der
+  erste Klick zeigt die Warnung und schärft den Button, der zweite Klick
+  führt die Aktion aus (nach 10 Sekunden ohne Bestätigung wird der Button
+  wieder entschärft). Gilt für beide Aktionen der Gefahrenzone.
+- Beim Löschen aller lokalen Lesezeichen werden vom Browser geschützte
+  Sonderordner jetzt übersprungen statt den ganzen Vorgang abzubrechen,
+  und Fehler werden angezeigt statt nur in der Konsole zu landen.
+- **Nextcloud-App 0.1.2**: Lesezeichen in der Nextcloud-Weboberfläche
+  waren bei Themes mit Hintergrundbild kaum lesbar - Überschrift und
+  Liste liegen jetzt gemeinsam auf einer eigenen Fläche mit passendem
+  Hintergrund (hell wie dunkel), und die URLs sind farblich vom Titel
+  abgesetzt.
 - **Deutlich schnelleres Zurücksetzen und Hochladen**: Beim Löschen der
   Cloud-Daten und beim Hochladen neuer Lesezeichen wurde bisher eine
   Anfrage nach der anderen geschickt - bei ~300 Lesezeichen dauerte ein
