@@ -366,6 +366,20 @@ Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
 ### 0.1.7
+- **Behoben (Datenverlust): Nach "Alle lokalen Lesezeichen löschen"
+  leerte der nächste Sync die Cloud.** Der gemerkte Sync-Zustand blieb
+  beim Löschen erhalten - die Lesezeichen galten dadurch als "bekannt,
+  aber lokal entfernt", was der Sync als bewusste Löschung deutete und
+  auf den Server übertrug. Der Sync-Zustand wird jetzt zusammen mit den
+  Lesezeichen zurückgesetzt, wodurch der nächste Sync die Cloud-
+  Lesezeichen wieder herunterlädt, statt sie zu löschen.
+- **Neues Sicherheitsnetz für die Server-Seite**: Würde ein Sync mehr als
+  die Hälfte aller Lesezeichen auf dem Server löschen, bricht er jetzt
+  mit einer Fehlermeldung ab - so wie es der bereits vorhandene Schutz
+  für die lokale Seite tut. Greift auch, wenn Lesezeichen auf anderem Weg
+  massenhaft verschwinden (z.B. von Hand im Browser gelöscht). Für den
+  bewusst gewollten Fall gibt es weiterhin "Cloud-Daten löschen und von
+  diesem Browser neu hochladen".
 - **Behoben: "Alle lokalen Lesezeichen löschen" reagierte in Firefox
   nicht.** Die Sicherheitsabfrage lief bisher über den eingebauten
   Bestätigungsdialog des Browsers (`window.confirm`) - den zeigt Firefox

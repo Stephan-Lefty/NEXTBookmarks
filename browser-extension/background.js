@@ -583,6 +583,20 @@ async function runSync() {
         throw new Error(chrome.i18n.getMessage('errorMassDeleteGuard', [String(pendingLocalDeletes), String(knownCount)]));
     }
 
+    // Dieselbe Sicherheitsbremse für die Gegenrichtung: Sind lokal
+    // massenhaft bekannte Lesezeichen verschwunden (z.B. weil das
+    // Browser-Profil neu aufgesetzt oder der Lesezeichen-Bestand komplett
+    // geleert wurde), würde Schritt 2 sie alle auch auf dem SERVER
+    // löschen - und damit den Bestand, den andere Geräte noch brauchen.
+    // Fehlt wirklich alles absichtlich, gibt es dafür den ausdrücklichen
+    // Weg "Cloud-Daten löschen und neu hochladen" in den Einstellungen.
+    const pendingRemoteDeletes = Object.entries(syncState).filter(([localId, state]) =>
+        !localIdSet.has(localId) && remoteById.has(String(state.remoteId))
+    ).length;
+    if (remoteList.length >= MASS_DELETE_MIN && pendingRemoteDeletes > remoteList.length * MASS_DELETE_RATIO) {
+        throw new Error(chrome.i18n.getMessage('errorMassRemoteDeleteGuard', [String(pendingRemoteDeletes), String(remoteList.length)]));
+    }
+
     let created = 0, updated = 0, deleted = 0, conflicts = 0;
     // Lokale Lesezeichen, die es auf dem Server noch nicht gibt. Werden in
     // Schritt 1 nur gesammelt und danach gebündelt hochgeladen.
