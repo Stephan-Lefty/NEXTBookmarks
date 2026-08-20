@@ -349,6 +349,26 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
+### 0.1.6
+- Fixed a performance regression: when downloading/creating local
+  bookmarks, `ensureLocalFolder()` called `browser.bookmarks.getTree()`
+  again for **every single** bookmark since 0.1.5, instead of just once
+  per sync run - on larger imports (e.g. 100+ bookmarks) this caused
+  noticeable delays (several minutes instead of seconds), especially on
+  Firefox. Root folder IDs are now resolved once and reused (verified:
+  104 bookmarks now trigger only 1 tree query instead of 104).
+- Prevented duplicates when downloading if the folder path doesn't match
+  exactly (e.g. because the root folder's name differs between browsers,
+  or browser-specific intermediate folders like Vivaldi's "Speed Dial"
+  groups appear in the stored path). Duplicate detection, which previously
+  only applied when uploading local bookmarks, now also applies when
+  downloading: if no match with an identical folder is found, it falls
+  back to matching by URL alone before creating a duplicate - neither
+  locally nor on the server. Combined with the performance issue above,
+  this could in particular have led to bookmarks being downloaded twice
+  if a very long sync run caused the background process (especially on
+  Firefox) to restart in the meantime.
+
 ### 0.1.5
 - Fixed a critical bug: sync state (`syncState`) was only scoped per
   server+account, not additionally per connection type. Switching from
