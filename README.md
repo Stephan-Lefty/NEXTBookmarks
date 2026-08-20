@@ -365,6 +365,14 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
+### 0.1.8
+- Das Einstellungsfenster wird jetzt ausdrücklich in den Vordergrund
+  geholt. Ist es bereits geöffnet, holt ein erneuter Klick auf
+  "Einstellungen" dieses Fenster nach vorne, statt ein zweites daneben zu
+  öffnen. Ein echtes "immer im Vordergrund" ist über die
+  Erweiterungs-Schnittstelle nicht möglich - das entscheidet die
+  Fensterverwaltung des Betriebssystems.
+
 ### 0.1.7
 - **Behoben (Datenverlust): Nach "Alle lokalen Lesezeichen löschen"
   leerte der nächste Sync die Cloud.** Der gemerkte Sync-Zustand blieb

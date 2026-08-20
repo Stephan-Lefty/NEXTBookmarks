@@ -60,18 +60,11 @@ document.getElementById('syncNow').addEventListener('click', async () => {
 // statt nur über den Umweg vivaldi://extensions -> Details.
 document.getElementById('openSettings').addEventListener('click', () => {
     stopAutoCloseCountdown();
-    browser.windows.create({
-        url: browser.runtime.getURL('options.html'),
-        type: 'popup',
-        // Nur ein Startwert für den allerersten Frame, bevor das Fenster
-        // sichtbar wird - options.js misst danach den tatsächlichen
-        // Inhalt und ruft browser.windows.update() mit der exakt
-        // passenden Größe auf (fitWindowToContent() dort). Muss also bei
-        // künftigen Layout-Änderungen nicht mehr von Hand nachjustiert
-        // werden.
-        width: 600,
-        height: 720,
-    });
+    // Das eigentliche Öffnen macht background.js: Nur dort lässt sich
+    // festhalten, ob das Einstellungsfenster schon offen ist - dieses
+    // Popup hier wird beim Klick ohnehin gleich geschlossen und verlöre
+    // die Information sofort wieder.
+    browser.runtime.sendMessage({ action: 'openSettings' });
     startAutoCloseCountdown();
 });
 

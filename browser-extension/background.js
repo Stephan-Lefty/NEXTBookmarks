@@ -768,6 +768,53 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         resetCloudFromLocal().then(sendResponse).catch(err => sendResponse({ success: false, error: err.message }));
         return true;
     }
+    if (message.action === 'openSettings') {
+        openSettingsWindow().then(() => sendResponse({ done: true })).catch(err => sendResponse({ error: err.message }));
+        return true;
+    }
+});
+
+// ---- Einstellungsfenster öffnen ---------------------------------------
+
+// Merkt sich das offene Einstellungsfenster, damit ein erneuter Klick auf
+// "Einstellungen" es nach vorne holt, statt ein zweites danebenzustellen.
+// Ein echtes "immer im Vordergrund" gibt es in der Erweiterungs-API nicht -
+// das entscheidet das Betriebssystem bzw. die Fensterverwaltung.
+let settingsWindowId = null;
+
+async function openSettingsWindow() {
+    if (settingsWindowId !== null) {
+        try {
+            // Existiert das Fenster noch? Dann in den Vordergrund holen.
+            // "drawAttention" lässt es zusätzlich in der Taskleiste blinken,
+            // falls die Fensterverwaltung den Fokuswechsel unterdrückt.
+            await browser.windows.update(settingsWindowId, { focused: true, drawAttention: true });
+            return;
+        } catch {
+            // Fenster wurde zwischenzeitlich geschlossen (oder der
+            // Hintergrundprozess neu gestartet) - dann unten neu öffnen.
+            settingsWindowId = null;
+        }
+    }
+
+    const created = await browser.windows.create({
+        url: browser.runtime.getURL('options.html'),
+        type: 'popup',
+        focused: true,
+        // Nur ein Startwert für den allerersten Frame, bevor das Fenster
+        // sichtbar wird - options.js misst danach den tatsächlichen
+        // Inhalt und ruft browser.windows.update() mit der exakt
+        // passenden Größe auf (fitWindowToContent() dort). Muss also bei
+        // künftigen Layout-Änderungen nicht mehr von Hand nachjustiert
+        // werden.
+        width: 600,
+        height: 720,
+    });
+    settingsWindowId = created ? created.id : null;
+}
+
+browser.windows.onRemoved.addListener((windowId) => {
+    if (windowId === settingsWindowId) settingsWindowId = null;
 });
 
 // ---- Onboarding: einmalige Frage "vorhandene Lesezeichen importieren?" --
