@@ -365,6 +365,21 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
+### 0.1.7
+- **Deutlich schnelleres Zurücksetzen und Hochladen**: Beim Löschen der
+  Cloud-Daten und beim Hochladen neuer Lesezeichen wurde bisher eine
+  Anfrage nach der anderen geschickt - bei ~300 Lesezeichen dauerte ein
+  kompletter "Cloud zurücksetzen"-Vorgang dadurch mehrere Minuten. Jetzt
+  laufen bis zu 8 Anfragen gleichzeitig (Messung mit simulierter Latenz:
+  rund 8× schneller), ohne den Server mit unbegrenzt vielen
+  gleichzeitigen Anfragen zu überlasten. Beim WebDAV-Modus wird die
+  Lesezeichen-Liste beim Zurücksetzen zudem in einem Schritt geleert,
+  statt sie pro Eintrag erneut zu durchlaufen.
+- **Zwischenmeldung beim Zurücksetzen**: Sobald die Cloud geleert ist,
+  erscheint "X Lesezeichen in der Cloud gelöscht. Lade jetzt die
+  Lesezeichen dieses Browsers hoch…" - vorher stand während des gesamten
+  Vorgangs unverändert "Setze Cloud-Daten zurück…" da.
+
 ### 0.1.6
 - **Browserübergreifende Ordnerpfade**: Der Name des browserspezifischen
   Wurzelordners ("Lesezeichenleiste", "Andere Lesezeichen", in Firefox

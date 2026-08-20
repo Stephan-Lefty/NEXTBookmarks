@@ -172,6 +172,12 @@
     "optionsResetCloudInProgress": {
         "message": "Setze Cloud-Daten zurück…"
     },
+    "optionsResetCloudClearedStatus": {
+        "message": "$count$ Lesezeichen in der Cloud gelöscht. Lade jetzt die Lesezeichen dieses Browsers hoch…",
+        "placeholders": {
+            "count": { "content": "$1" }
+        }
+    },
     "statusImporting": {
         "message": "Importiere…"
     },

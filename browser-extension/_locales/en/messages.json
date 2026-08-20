@@ -172,6 +172,12 @@
     "optionsResetCloudInProgress": {
         "message": "Resetting cloud data…"
     },
+    "optionsResetCloudClearedStatus": {
+        "message": "$count$ bookmarks deleted in the cloud. Now uploading this browser's bookmarks…",
+        "placeholders": {
+            "count": { "content": "$1" }
+        }
+    },
     "statusImporting": {
         "message": "Importing…"
     },
