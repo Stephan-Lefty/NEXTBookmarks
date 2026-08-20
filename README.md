@@ -365,66 +365,46 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
-### 0.1.9
-- Neue Einstellung "Ordner beim Sync überspringen": Ein oberster Ordner
-  (direkt unter einem Wurzelordner) mit diesem Namen wird beim
+### 0.1.6
+- **Browserübergreifende Ordnerpfade**: Der Name des browserspezifischen
+  Wurzelordners ("Lesezeichenleiste", "Andere Lesezeichen", in Firefox
+  z.B. "Lesezeichen-Menü") ist nicht mehr Teil des gespeicherten
+  Ordnerpfads - nur was darunter liegt (z.B. "Schnellwahl/Gruppenname")
+  wird synchronisiert, und landet beim Herunterladen automatisch im
+  jeweils eigenen Wurzelordner des Zielbrowsers. Behebt die Ursache
+  doppelt angelegter Lesezeichen beim Sync zwischen verschiedenen
+  Browsern (der Textvergleich der Pfade scheiterte bisher an den
+  unterschiedlichen Wurzelordner-Namen). Zusätzlich als Sicherheitsnetz:
+  Findet sich beim Abgleich kein Treffer mit exakt gleichem Ordner, wird
+  vor dem Anlegen eines Duplikats zusätzlich nur nach der URL gesucht -
+  in beide Richtungen, lokal wie auf dem Server.
+- **Performance beim Herunterladen**: `ensureLocalFolder()` rief bei jedem
+  einzelnen Lesezeichen erneut `browser.bookmarks.getTree()` auf, statt
+  nur einmal pro Sync-Lauf - bei größeren Importen (100+ Lesezeichen)
+  führte das zu Verzögerungen von mehreren Minuten statt Sekunden,
+  besonders in Firefox. Die Wurzelordner-IDs werden jetzt einmalig
+  ermittelt und wiederverwendet (verifiziert: 104 Lesezeichen erzeugen
+  nur noch 1 statt 104 Baum-Abfragen). Sehr lange Sync-Läufe konnten
+  zudem den Hintergrundprozess (v.a. in Firefox) zwischenzeitlich neu
+  starten lassen und dadurch zusätzlich Duplikate begünstigen.
+- **Neue Einstellung "Ordner beim Sync überspringen"**: Ein oberster
+  Ordner (direkt unter einem Wurzelordner) mit diesem Namen wird beim
   Synchronisieren übersprungen - sein Inhalt landet dann direkt im
   Wurzelordner. Praktisch für Vivaldis "Schnellwahl"-Ordner, damit dessen
   Gruppen nicht in einem zusätzlichen Zwischenordner landen. Auswahl per
   Dropdown statt Freitext (zeigt nur tatsächlich vorhandene oberste
   Ordnernamen dieses Browsers, kein Tippfehler möglich), und greift
-  bewusst nur auf der obersten Ebene - ein gleichnamiger, aber
-  inhaltlich unabhängiger Ordner tiefer im Baum bleibt unangetastet.
-- Neuer Button "Cloud-Daten löschen und von diesem Browser neu hochladen"
-  in der Gefahrenzone: Reparatur-Werkzeug für den Fall, dass die Cloud-
-  Seite durch frühere Sync-Fehler durcheinandergeraten ist (verschachtelte/
-  doppelte Ordner o.ä.) - löscht alle Lesezeichen auf dem Server und lädt
-  die Lesezeichen dieses Browsers komplett neu hoch.
-
-### 0.1.8
-- Ursache der Ordnerpfad-Dopplungen (siehe 0.1.6) direkt behoben statt nur
-  abgefangen: Der Name des browserspezifischen Wurzelordners
-  ("Lesezeichenleiste", "Andere Lesezeichen", in Firefox z.B.
-  "Lesezeichen-Menü") ist jetzt nicht mehr Teil des gespeicherten
-  Ordnerpfads - nur was darunter liegt (z.B. "Schnellwahl/Gruppenname")
-  wird synchronisiert. Beim Herunterladen landet das automatisch im
-  jeweils eigenen Wurzelordner des Zielbrowsers. Dadurch kann der
-  Textvergleich der Ordnerpfade beim erneuten Sync nie mehr an
-  unterschiedlichen Wurzelordner-Namen zwischen Browsern scheitern - die
-  in 0.1.6 ergänzte URL-Rückfallsuche bleibt zusätzlich als
-  Sicherheitsnetz bestehen. Live per Playwright verifiziert (inkl.
-  Round-Trip-Test: Herunterladen landet korrekt im Wurzelordner des
-  jeweiligen Browsers).
-
-### 0.1.7
-- Neue "Gefahrenzone" in den Einstellungen: Button "Alle lokalen
-  Lesezeichen löschen" (mit Sicherheitsabfrage). Gedacht für den Einsatz
-  direkt nach einer Neuinstallation des Browsers, bevor zum ersten Mal
-  synchronisiert wird - verhindert, dass die vom Browser mitgelieferten
-  Standard-Lesezeichen versehentlich dauerhaft mit in die Cloud
-  hochgeladen werden.
-
-### 0.1.6
-- Performance-Regression behoben: Beim Herunterladen/Anlegen lokaler
-  Lesezeichen rief `ensureLocalFolder()` seit 0.1.5 bei **jedem einzelnen**
-  Lesezeichen erneut `browser.bookmarks.getTree()` auf, statt nur einmal
-  pro Sync-Lauf - bei größeren Importen (z.B. 100+ Lesezeichen) führte das
-  zu spürbaren Verzögerungen (mehrere Minuten statt Sekunden), besonders
-  in Firefox. Die Wurzelordner-IDs werden jetzt einmalig ermittelt und
-  wiederverwendet (verifiziert: 104 Lesezeichen erzeugen jetzt nur noch
-  1 statt 104 Baum-Abfragen).
-- Duplikate beim Herunterladen verhindert, wenn der Ordnerpfad nicht exakt
-  übereinstimmt (z.B. weil der Name des Wurzelordners je nach Browser
-  unterschiedlich ist, oder browserspezifische Zwischenordner wie Vivaldis
-  "Schnellwahl"-Gruppen im gespeicherten Pfad stehen). Die Dopplungs-
-  Erkennung, die bisher nur beim Hochladen lokaler Lesezeichen griff,
-  gilt jetzt auch beim Herunterladen: Findet sich kein Treffer mit exakt
-  gleichem Ordner, wird zur Sicherheit zusätzlich nur nach der URL
-  gesucht, bevor ein Duplikat entsteht - weder lokal noch auf dem Server.
-  Kann zusammen mit dem oben genannten Performance-Fix insbesondere in
-  Kombination zu doppelt heruntergeladenen Lesezeichen geführt haben,
-  wenn ein sehr langer Sync-Lauf den Hintergrundprozess (v.a. in Firefox)
-  zwischenzeitlich neu starten ließ.
+  bewusst nur auf der obersten Ebene - ein gleichnamiger, aber inhaltlich
+  unabhängiger Ordner tiefer im Baum bleibt unangetastet.
+- **Neue "Gefahrenzone" in den Einstellungen** (jeweils mit
+  Sicherheitsabfrage):
+  - "Alle lokalen Lesezeichen löschen" - gedacht direkt nach einer
+    Neuinstallation des Browsers, bevor zum ersten Mal synchronisiert
+    wird: verhindert, dass die mitgelieferten Standard-Lesezeichen
+    versehentlich dauerhaft in der Cloud landen.
+  - "Cloud-Daten löschen und von diesem Browser neu hochladen" -
+    Reparatur-Werkzeug, falls die Cloud-Seite durch frühere Sync-Fehler
+    durcheinandergeraten ist (verschachtelte/doppelte Ordner o.ä.).
 
 ### 0.1.5
 - Kritischer Fehler behoben: Der Sync-Zustand (`syncState`) wurde nur pro
