@@ -130,6 +130,27 @@
             "count": { "content": "$1" }
         }
     },
+    "optionsDangerZoneHeading": {
+        "message": "Gefahrenzone"
+    },
+    "optionsDeleteAllBookmarksDescription": {
+        "message": "Praktisch direkt nach einer Neuinstallation des Browsers: Entfernt alle Standard-Lesezeichen, bevor du zum ersten Mal synchronisierst - so landen sie nicht versehentlich dauerhaft in deiner Cloud."
+    },
+    "optionsDeleteAllBookmarksButton": {
+        "message": "Alle lokalen Lesezeichen löschen"
+    },
+    "optionsDeleteAllBookmarksConfirm": {
+        "message": "Wirklich ALLE Lesezeichen in diesem Browser unwiderruflich löschen? Das kann nicht rückgängig gemacht werden - nutze vorher bei Bedarf \"Sicherungskopie exportieren\"."
+    },
+    "optionsDeleteAllBookmarksInProgress": {
+        "message": "Lösche…"
+    },
+    "optionsDeleteAllBookmarksDoneStatus": {
+        "message": "$count$ Lesezeichen/Ordner gelöscht.",
+        "placeholders": {
+            "count": { "content": "$1" }
+        }
+    },
     "statusImporting": {
         "message": "Importiere…"
     },

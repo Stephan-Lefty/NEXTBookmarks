@@ -365,6 +365,14 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
+### 0.1.7
+- Neue "Gefahrenzone" in den Einstellungen: Button "Alle lokalen
+  Lesezeichen löschen" (mit Sicherheitsabfrage). Gedacht für den Einsatz
+  direkt nach einer Neuinstallation des Browsers, bevor zum ersten Mal
+  synchronisiert wird - verhindert, dass die vom Browser mitgelieferten
+  Standard-Lesezeichen versehentlich dauerhaft mit in die Cloud
+  hochgeladen werden.
+
 ### 0.1.6
 - Performance-Regression behoben: Beim Herunterladen/Anlegen lokaler
   Lesezeichen rief `ensureLocalFolder()` seit 0.1.5 bei **jedem einzelnen**
