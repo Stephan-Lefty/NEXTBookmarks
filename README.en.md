@@ -349,60 +349,42 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
-### 0.1.9
-- New setting "Folder to skip during sync": a top-level folder (directly
-  under a root folder) with this name is skipped when syncing - its
-  contents end up directly in the root folder instead. Handy for
+### 0.1.6
+- **Browser-agnostic folder paths**: the browser-specific root folder's
+  name ("Bookmarks bar", "Other bookmarks", or e.g. "Bookmarks Menu" in
+  Firefox) is no longer part of the stored folder path - only what's
+  below it (e.g. "Speed Dial/GroupName") gets synced, and when
+  downloading it's automatically placed inside the target browser's own
+  root folder. Fixes the root cause of bookmarks being duplicated when
+  syncing between different browsers (the folder-path text comparison
+  used to fail because of the differing root folder names). Additional
+  safety net: if no match with an identical folder is found during
+  reconciliation, it falls back to matching by URL alone before creating
+  a duplicate - in both directions, locally and on the server.
+- **Download performance**: `ensureLocalFolder()` called
+  `browser.bookmarks.getTree()` again for every single bookmark instead
+  of just once per sync run - on larger imports (100+ bookmarks) this
+  caused delays of several minutes instead of seconds, especially on
+  Firefox. Root folder IDs are now resolved once and reused (verified:
+  104 bookmarks now trigger only 1 tree query instead of 104). Very long
+  sync runs could additionally cause the background process (especially
+  on Firefox) to restart mid-sync, further encouraging duplicates.
+- **New setting "Folder to skip during sync"**: a top-level folder
+  (directly under a root folder) with this name is skipped when syncing -
+  its contents end up directly in the root folder instead. Handy for
   Vivaldi's "Speed Dial" folder, so its groups don't end up in an extra
   intermediate folder. Picked from a dropdown instead of typed as free
   text (only lists this browser's actual top-level folder names, so no
   typos are possible), and deliberately only applies at the top level -
   a same-named but unrelated folder deeper in the tree stays untouched.
-- New "Delete cloud data and re-upload from this browser" button in the
-  danger zone: a repair tool for when the cloud side has gotten messy
-  from earlier sync bugs (nested/duplicate folders etc.) - deletes all
-  bookmarks on the server and re-uploads this browser's bookmarks
-  completely fresh.
-
-### 0.1.8
-- Fixed the root cause of the folder-path duplication issue (see 0.1.6)
-  instead of just catching it: the browser-specific root folder's name
-  ("Bookmarks bar", "Other bookmarks", or e.g. "Bookmarks Menu" in
-  Firefox) is no longer part of the stored folder path - only what's
-  below it (e.g. "Speed Dial/GroupName") gets synced. When downloading,
-  it's automatically placed inside the target browser's own root folder.
-  This means the folder-path text comparison can no longer fail due to
-  browsers naming their root folders differently - the URL fallback
-  search added in 0.1.6 remains in place as an additional safety net.
-  Verified live in Playwright (including a round-trip test: downloading
-  correctly lands inside each browser's own root folder).
-
-### 0.1.7
-- New "Danger zone" in settings: "Delete all local bookmarks" button
-  (with a confirmation prompt). Meant to be used right after a fresh
-  browser install, before syncing for the first time - prevents the
-  browser's default bookmarks from accidentally being permanently
-  uploaded to the cloud.
-
-### 0.1.6
-- Fixed a performance regression: when downloading/creating local
-  bookmarks, `ensureLocalFolder()` called `browser.bookmarks.getTree()`
-  again for **every single** bookmark since 0.1.5, instead of just once
-  per sync run - on larger imports (e.g. 100+ bookmarks) this caused
-  noticeable delays (several minutes instead of seconds), especially on
-  Firefox. Root folder IDs are now resolved once and reused (verified:
-  104 bookmarks now trigger only 1 tree query instead of 104).
-- Prevented duplicates when downloading if the folder path doesn't match
-  exactly (e.g. because the root folder's name differs between browsers,
-  or browser-specific intermediate folders like Vivaldi's "Speed Dial"
-  groups appear in the stored path). Duplicate detection, which previously
-  only applied when uploading local bookmarks, now also applies when
-  downloading: if no match with an identical folder is found, it falls
-  back to matching by URL alone before creating a duplicate - neither
-  locally nor on the server. Combined with the performance issue above,
-  this could in particular have led to bookmarks being downloaded twice
-  if a very long sync run caused the background process (especially on
-  Firefox) to restart in the meantime.
+- **New "Danger zone" in settings** (each with a confirmation prompt):
+  - "Delete all local bookmarks" - meant to be used right after a fresh
+    browser install, before syncing for the first time: prevents the
+    browser's default bookmarks from accidentally ending up permanently
+    in the cloud.
+  - "Delete cloud data and re-upload from this browser" - a repair tool
+    for when the cloud side has gotten messy from earlier sync bugs
+    (nested/duplicate folders etc.).
 
 ### 0.1.5
 - Fixed a critical bug: sync state (`syncState`) was only scoped per
