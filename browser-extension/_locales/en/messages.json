@@ -86,10 +86,13 @@
         "message": "The very first sync to a new connection always has to be started manually (\"Sync now\" button). After that it runs automatically according to the rule chosen here."
     },
     "optionsSkipFolderNameLabel": {
-        "message": "Folder name to skip during sync:"
+        "message": "Folder to skip during sync:"
+    },
+    "optionsSkipFolderNameNone": {
+        "message": "(none)"
     },
     "optionsSkipFolderNameHint": {
-        "message": "Optional: a folder with exactly this name is skipped when syncing - its contents end up one level higher instead, regardless of which level it appears at (e.g. \"Speed Dial\" on Vivaldi). Only affects folders with exactly this name."
+        "message": "Optional: a top-level folder with this name is skipped when syncing - its contents end up directly in the root folder instead. Handy for Vivaldi's \"Speed Dial\" folder, so its groups don't end up in an extra intermediate folder. The list only shows this browser's top-level folders, so nothing unrelated can be picked by mistake."
     },
     "optionsSaveButton": {
         "message": "Save"

@@ -266,10 +266,13 @@ function getBackend(settings) {
 // Zielbrowsers (siehe ensureLocalFolder()).
 //
 // Zusätzlich kann in den Einstellungen ein einzelner Ordnername
-// (skipFolderName) hinterlegt werden, der ebenfalls übersprungen wird, egal
-// auf welcher Ebene er vorkommt - z.B. "Schnellwahl" bei Vivaldi, damit
-// dessen Gruppen direkt im Wurzelordner landen statt in einem zusätzlichen
-// Zwischenordner.
+// (skipFolderName) hinterlegt werden, der ebenfalls übersprungen wird -
+// z.B. "Schnellwahl" bei Vivaldi, damit dessen Gruppen direkt im
+// Wurzelordner landen statt in einem zusätzlichen Zwischenordner. Das
+// Überspringen greift bewusst NUR auf der obersten Ebene (direkt unter
+// einem Wurzelordner, wo Vivaldis Schnellwahl auch tatsächlich liegt) -
+// sonst könnte ein gleichnamiger, aber inhaltlich unabhängiger Ordner
+// irgendwo tiefer im Baum fälschlich mit übersprungen werden.
 async function getLocalBookmarksFlat() {
     const { skipFolderName } = await browser.storage.sync.get(['skipFolderName']);
     const tree = await browser.bookmarks.getTree();
@@ -287,7 +290,8 @@ async function getLocalBookmarksFlat() {
                     position: position++,
                 });
             } else if (node.children) {
-                const skip = node.title && skipFolderName && node.title === skipFolderName;
+                const isTopLevel = pathParts.length === 0;
+                const skip = isTopLevel && node.title && skipFolderName && node.title === skipFolderName;
                 walk(node.children, skip ? pathParts : [...pathParts, node.title].filter(Boolean));
             }
         }

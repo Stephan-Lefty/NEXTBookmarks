@@ -86,10 +86,13 @@
         "message": "Die allererste Synchronisation zu einer neuen Verbindung muss immer manuell gestartet werden (Button \"Jetzt synchronisieren\"). Danach läuft es automatisch nach der hier gewählten Regel."
     },
     "optionsSkipFolderNameLabel": {
-        "message": "Ordnername beim Sync überspringen:"
+        "message": "Ordner beim Sync überspringen:"
+    },
+    "optionsSkipFolderNameNone": {
+        "message": "(keinen)"
     },
     "optionsSkipFolderNameHint": {
-        "message": "Optional: Ein Ordner mit genau diesem Namen wird beim Synchronisieren übersprungen - sein Inhalt landet dann eine Ebene höher, egal auf welcher Ebene er vorkommt (z.B. \"Schnellwahl\" bei Vivaldi). Betrifft nur Ordner mit exakt diesem Namen."
+        "message": "Optional: Ein oberster Ordner mit diesem Namen wird beim Synchronisieren übersprungen - sein Inhalt landet dann direkt im Wurzelordner. Praktisch für Vivaldis \"Schnellwahl\"-Ordner, damit dessen Gruppen nicht in einem zusätzlichen Zwischenordner landen. Die Auswahl zeigt nur oberste Ordner dieses Browsers, damit nichts Falsches getroffen wird."
     },
     "optionsSaveButton": {
         "message": "Speichern"

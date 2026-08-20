@@ -11,6 +11,36 @@ function updateSyncModeHint() {
 }
 document.getElementById('syncMode').addEventListener('change', updateSyncModeHint);
 
+// Befüllt das "Ordnername überspringen"-Dropdown mit den tatsächlich
+// vorhandenen obersten Ordnernamen dieses Browsers (direkt unter einem
+// Wurzelordner, z.B. "Schnellwahl" bei Vivaldi) - Auswahl statt Freitext,
+// damit kein Tippfehler zu einem stillschweigend wirkungslosen Eintrag
+// führen kann. Übersprungen wird ohnehin nur auf dieser obersten Ebene
+// (siehe getLocalBookmarksFlat() in background.js), das Dropdown zeigt
+// deshalb auch nur genau diese Kandidaten an.
+async function populateSkipFolderOptions(selectedValue) {
+    const select = document.getElementById('skipFolderName');
+    const tree = await browser.bookmarks.getTree();
+    const topLevelNames = new Set();
+    for (const root of tree[0].children) {
+        for (const child of root.children || []) {
+            if (!child.url && child.title) topLevelNames.add(child.title);
+        }
+    }
+    // Falls der gespeicherte Wert aktuell gar nicht (mehr) existiert (z.B.
+    // Ordner umbenannt/gelöscht), trotzdem als Option anbieten, statt die
+    // Einstellung beim Öffnen stillschweigend zu verwerfen.
+    if (selectedValue) topLevelNames.add(selectedValue);
+
+    for (const name of topLevelNames) {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    }
+    select.value = selectedValue || '';
+}
+
 // Lädt gespeicherte Werte beim Öffnen der Seite
 document.addEventListener('DOMContentLoaded', async () => {
     const data = await browser.storage.sync.get(['serverUrl', 'username', 'appPassword', 'syncMode', 'autoSyncMode', 'skipFolderName']);
@@ -19,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('username').value = data.username || '';
     document.getElementById('appPassword').value = data.appPassword || '';
     document.getElementById('autoSyncMode').value = data.autoSyncMode || 'onChange';
-    document.getElementById('skipFolderName').value = data.skipFolderName || '';
+    await populateSkipFolderOptions(data.skipFolderName || '');
     updateSyncModeHint();
 });
 
