@@ -145,20 +145,20 @@
     "onboardingHeading": {
         "message": "Willkommen bei NEXTBookmarks"
     },
-    "onboardingIntroPrefix": {
-        "message": "Du hast aktuell"
+    "onboardingImportFromCloudQuestion": {
+        "message": "Sollen deine vorhandenen Lesezeichen aus der Nextcloud in diesen Browser importiert werden?"
     },
-    "onboardingIntroSuffix": {
-        "message": "Lesezeichen in diesem Browser. Sollen diese jetzt in deine Nextcloud importiert werden?"
+    "onboardingUploadToCloudQuestion": {
+        "message": "Sollen deine lokalen Lesezeichen aus diesem Browser in die Nextcloud hochgeladen werden?"
     },
-    "onboardingImportYesButton": {
-        "message": "Ja, importieren"
+    "onboardingYesButton": {
+        "message": "Ja"
     },
-    "onboardingImportNoButton": {
-        "message": "Nein, überspringen"
+    "onboardingNoButton": {
+        "message": "Nein"
     },
     "onboardingImportDoneStatus": {
-        "message": "Fertig! $created$ Lesezeichen importiert. Dieses Fenster kannst du jetzt schließen.",
+        "message": "Fertig! $created$ Lesezeichen übertragen. Dieses Fenster kannst du jetzt schließen.",
         "placeholders": {
             "created": { "content": "$1" }
         }

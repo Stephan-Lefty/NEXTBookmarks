@@ -16,15 +16,23 @@
             <span class="icon">📥</span>
             <span data-i18n="onboardingHeading"></span>
         </div>
-        <p>
-            <span data-i18n="onboardingIntroPrefix"></span>
-            <strong id="count">…</strong>
-            <span data-i18n="onboardingIntroSuffix"></span>
-        </p>
-        <div class="actions">
-            <button id="importNo" data-i18n="onboardingImportNoButton"></button>
-            <button id="importYes" class="primary" data-i18n="onboardingImportYesButton"></button>
+
+        <div id="stepImport">
+            <p data-i18n="onboardingImportFromCloudQuestion"></p>
+            <div class="actions">
+                <button id="importFromCloudNo" data-i18n="onboardingNoButton"></button>
+                <button id="importFromCloudYes" class="primary" data-i18n="onboardingYesButton"></button>
+            </div>
         </div>
+
+        <div id="stepUpload" hidden>
+            <p data-i18n="onboardingUploadToCloudQuestion"></p>
+            <div class="actions">
+                <button id="uploadToCloudNo" data-i18n="onboardingNoButton"></button>
+                <button id="uploadToCloudYes" class="primary" data-i18n="onboardingYesButton"></button>
+            </div>
+        </div>
+
         <p id="status" class="status"></p>
     </div>
     <script src="browser-polyfill-shim.js"></script>
