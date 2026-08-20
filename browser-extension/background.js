@@ -284,21 +284,23 @@ async function getLocalBookmarksFlat() {
 const folderIdCache = new Map();
 
 async function ensureLocalFolder(path) {
+    // Schon bekannte Ordnerpfade sofort ohne jede Baumabfrage zurückgeben -
+    // wichtig bei vielen Lesezeichen im selben Ordner, siehe Kommentar bei
+    // getRootFolderIds() oben.
+    if (path && folderIdCache.has(path)) return folderIdCache.get(path);
+
     // Die IDs der Wurzelordner ("Lesezeichenleiste", "Andere Lesezeichen"
     // o.ä.) sind browserabhängig - Chrome nutzt feste numerische IDs ('1',
     // '2', ...), Firefox dagegen eigene GUID-artige Strings
     // ("toolbar_____" usw.). Ein hartkodiertes '1' existiert in Firefox
     // schlicht nicht und führt dort zu "Invalid bookmark"-Fehlern beim
-    // Anlegen. Deshalb die tatsächlichen Wurzelordner immer live abfragen.
-    const tree = await browser.bookmarks.getTree();
-    const rootChildren = tree[0].children;
-    const toolbarFolderId = rootChildren[0].id;
-    const otherFolderId = (rootChildren[1] || rootChildren[0]).id;
+    // Anlegen. Deshalb die tatsächlichen Wurzelordner immer live abfragen
+    // (aber nur einmal pro Sync-Lauf, siehe getRootFolderIds()).
+    const { rootChildren, toolbarFolderId, otherFolderId } = await getRootFolderIds();
 
     if (!path) {
         return otherFolderId;
     }
-    if (folderIdCache.has(path)) return folderIdCache.get(path);
 
     const parts = path.split('/').filter(Boolean);
     let parentId = null;
@@ -351,6 +353,26 @@ async function createLocalBookmark({ url, title, folder }) {
 // kennt hunderte Lesezeichen, die neue Verbindungsart hat aber noch gar
 // keine - der Sicherheitsabbruch (siehe runSync()) greift dann zu Recht,
 // weil es sonst wie eine Massenlöschung aussähe.
+// Die Wurzelordner-IDs ändern sich innerhalb eines Sync-Laufs nicht, auch
+// wenn währenddessen laufend neue Lesezeichen/Ordner angelegt werden -
+// deshalb hier einmalig ermitteln und wiederverwenden, statt bei jedem
+// einzelnen Lesezeichen erneut den kompletten Baum abzufragen (das hat
+// sich bei einem größeren Import als spürbar langsam erwiesen, mit
+// wachsendem Baum sogar zunehmend langsamer).
+let rootFolderIdsCache = null;
+
+async function getRootFolderIds() {
+    if (rootFolderIdsCache) return rootFolderIdsCache;
+    const tree = await browser.bookmarks.getTree();
+    const rootChildren = tree[0].children;
+    rootFolderIdsCache = {
+        rootChildren,
+        toolbarFolderId: rootChildren[0].id,
+        otherFolderId: (rootChildren[1] || rootChildren[0]).id,
+    };
+    return rootFolderIdsCache;
+}
+
 function profileStorageKey(settings, baseName) {
     return `${baseName}::${settings.serverUrl}::${settings.username}::${settings.syncMode}`;
 }
@@ -489,6 +511,17 @@ async function runSync() {
                 r.url === local.url && r.folder === local.folder && !handledRemoteIds.has(String(r.id))
             );
 
+            // Fällt der Ordnerpfad-Vergleich aus (z.B. weil der Wurzelordner
+            // je nach Browser anders heißt, oder browserspezifische Zwischen-
+            // ordner wie Vivaldis "Schnellwahl"-Gruppen im Pfad stehen), zur
+            // Sicherheit nur noch nach URL suchen, bevor ein Duplikat auf dem
+            // Server entsteht. Das Lesezeichen wird dabei serverseitig in den
+            // hier tatsächlich vorgefundenen Ordner "verschoben" (siehe
+            // updateRemoteBookmark weiter unten) statt dupliziert zu werden.
+            if (!remote) {
+                remote = remoteList.find(r => r.url === local.url && !handledRemoteIds.has(String(r.id)));
+            }
+
             if (!remote) {
                 const saved = await backend.createRemoteBookmark(settings, {
                     url: local.url, title: local.title, folder: local.folder, position: local.position,
@@ -547,6 +580,14 @@ async function runSync() {
         }
     }
 
+    // Alle URLs, die nach Schritt 1 bereits einem lokalen Lesezeichen
+    // zugeordnet sind (egal ob neu angelegt, aktualisiert oder unverändert
+    // übernommen) - verhindert in Schritt 2 Duplikate, wenn für dieselbe URL
+    // in Schritt 1 wegen abweichendem Ordnerpfad kein Remote-Treffer
+    // gefunden und stattdessen ein neuer Remote-Eintrag hochgeladen wurde
+    // (siehe URL-Fallback oben).
+    const claimedLocalUrls = new Set(Object.values(newSyncState).map(s => s.url));
+
     // 2) Übrige Remote-Lesezeichen: entweder komplett neu (lokal anlegen)
     // oder ihr lokales Gegenstück wurde inzwischen gelöscht (remote auch
     // löschen).
@@ -560,6 +601,12 @@ async function runSync() {
             deleted++;
             continue;
         }
+
+        // Es existiert bereits ein lokales Lesezeichen mit dieser URL (siehe
+        // claimedLocalUrls oben) - kein Duplikat anlegen. Dieser Remote-
+        // Eintrag bleibt vorerst unverknüpft und wird beim nächsten Sync
+        // erneut geprüft.
+        if (claimedLocalUrls.has(remote.url)) continue;
 
         const createdLocal = await createLocalBookmark({ url: remote.url, title: remote.title, folder: remote.folder });
         newSyncState[createdLocal.id] = {

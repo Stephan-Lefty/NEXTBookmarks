@@ -365,6 +365,28 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
+### 0.1.6
+- Performance-Regression behoben: Beim Herunterladen/Anlegen lokaler
+  Lesezeichen rief `ensureLocalFolder()` seit 0.1.5 bei **jedem einzelnen**
+  Lesezeichen erneut `browser.bookmarks.getTree()` auf, statt nur einmal
+  pro Sync-Lauf - bei größeren Importen (z.B. 100+ Lesezeichen) führte das
+  zu spürbaren Verzögerungen (mehrere Minuten statt Sekunden), besonders
+  in Firefox. Die Wurzelordner-IDs werden jetzt einmalig ermittelt und
+  wiederverwendet (verifiziert: 104 Lesezeichen erzeugen jetzt nur noch
+  1 statt 104 Baum-Abfragen).
+- Duplikate beim Herunterladen verhindert, wenn der Ordnerpfad nicht exakt
+  übereinstimmt (z.B. weil der Name des Wurzelordners je nach Browser
+  unterschiedlich ist, oder browserspezifische Zwischenordner wie Vivaldis
+  "Schnellwahl"-Gruppen im gespeicherten Pfad stehen). Die Dopplungs-
+  Erkennung, die bisher nur beim Hochladen lokaler Lesezeichen griff,
+  gilt jetzt auch beim Herunterladen: Findet sich kein Treffer mit exakt
+  gleichem Ordner, wird zur Sicherheit zusätzlich nur nach der URL
+  gesucht, bevor ein Duplikat entsteht - weder lokal noch auf dem Server.
+  Kann zusammen mit dem oben genannten Performance-Fix insbesondere in
+  Kombination zu doppelt heruntergeladenen Lesezeichen geführt haben,
+  wenn ein sehr langer Sync-Lauf den Hintergrundprozess (v.a. in Firefox)
+  zwischenzeitlich neu starten ließ.
+
 ### 0.1.5
 - Kritischer Fehler behoben: Der Sync-Zustand (`syncState`) wurde nur pro
   Server+Konto getrennt gespeichert, nicht zusätzlich pro Verbindungsart.
