@@ -85,6 +85,12 @@
     "optionsAutoSyncHint": {
         "message": "The very first sync to a new connection always has to be started manually (\"Sync now\" button). After that it runs automatically according to the rule chosen here."
     },
+    "optionsSkipFolderNameLabel": {
+        "message": "Folder name to skip during sync:"
+    },
+    "optionsSkipFolderNameHint": {
+        "message": "Optional: a folder with exactly this name is skipped when syncing - its contents end up one level higher instead, regardless of which level it appears at (e.g. \"Speed Dial\" on Vivaldi). Only affects folders with exactly this name."
+    },
     "optionsSaveButton": {
         "message": "Save"
     },
@@ -150,6 +156,18 @@
         "placeholders": {
             "count": { "content": "$1" }
         }
+    },
+    "optionsResetCloudDescription": {
+        "message": "If the cloud data has gotten messy (e.g. nested/duplicate folders from earlier sync bugs): deletes ALL bookmarks on the server (for the currently selected connection type) and then re-uploads this browser's bookmarks completely fresh - this browser becomes the sole source of truth."
+    },
+    "optionsResetCloudButton": {
+        "message": "Delete cloud data and re-upload from this browser"
+    },
+    "optionsResetCloudConfirm": {
+        "message": "Really delete ALL bookmarks on the server irreversibly and replace them with this browser's bookmarks? Other devices will lose their previous sync state. This cannot be undone."
+    },
+    "optionsResetCloudInProgress": {
+        "message": "Resetting cloud data…"
     },
     "statusImporting": {
         "message": "Importing…"

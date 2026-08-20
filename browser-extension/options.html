@@ -67,6 +67,12 @@
             <p class="hint" data-i18n="optionsAutoSyncHint"></p>
         </div>
 
+        <div class="field">
+            <label for="skipFolderName" data-i18n="optionsSkipFolderNameLabel"></label>
+            <input id="skipFolderName" placeholder="Schnellwahl">
+            <p class="hint" data-i18n="optionsSkipFolderNameHint"></p>
+        </div>
+
         <div class="actions">
             <button id="save" class="primary" data-i18n="optionsSaveButton"></button>
             <span id="status" class="status"></span>
@@ -100,6 +106,12 @@
             <div class="actions">
                 <button id="deleteAllBookmarks" style="color: var(--danger);" data-i18n="optionsDeleteAllBookmarksButton"></button>
                 <span id="deleteAllStatus" class="status"></span>
+            </div>
+
+            <p data-i18n="optionsResetCloudDescription"></p>
+            <div class="actions">
+                <button id="resetCloud" style="color: var(--danger);" data-i18n="optionsResetCloudButton"></button>
+                <span id="resetCloudStatus" class="status"></span>
             </div>
         </section>
 

@@ -365,6 +365,19 @@ Wenn du am Code weiterarbeitest und über die Docker-Testinstanz
 Bezieht sich auf die Versionsnummer der Browser-Erweiterung
 (`browser-extension/manifest.json`), die auch im Popup angezeigt wird.
 
+### 0.1.9
+- Neue Einstellung "Ordnername beim Sync überspringen": Ein Ordner mit
+  genau diesem Namen wird beim Synchronisieren übersprungen (sein Inhalt
+  landet eine Ebene höher), egal auf welcher Ebene er vorkommt - z.B.
+  "Schnellwahl" bei Vivaldi, damit dessen Gruppen direkt im Wurzelordner
+  landen statt in einem zusätzlichen Zwischenordner. Betrifft gezielt nur
+  Ordner mit exakt diesem Namen, nicht pauschal eine bestimmte Ebene.
+- Neuer Button "Cloud-Daten löschen und von diesem Browser neu hochladen"
+  in der Gefahrenzone: Reparatur-Werkzeug für den Fall, dass die Cloud-
+  Seite durch frühere Sync-Fehler durcheinandergeraten ist (verschachtelte/
+  doppelte Ordner o.ä.) - löscht alle Lesezeichen auf dem Server und lädt
+  die Lesezeichen dieses Browsers komplett neu hoch.
+
 ### 0.1.8
 - Ursache der Ordnerpfad-Dopplungen (siehe 0.1.6) direkt behoben statt nur
   abgefangen: Der Name des browserspezifischen Wurzelordners
