@@ -172,6 +172,16 @@ document.getElementById('deleteAllBookmarks').addEventListener('click', async ()
     statusEl.textContent = chrome.i18n.getMessage('optionsDeleteAllBookmarksDoneStatus', [String(count)]);
 });
 
+// Zwischenmeldung vom Hintergrundprozess: Die Cloud ist geleert, das
+// Hochladen läuft noch. Ohne diese Rückmeldung stünde bei vielen
+// Lesezeichen minutenlang nur "Setze Cloud-Daten zurück…" da.
+browser.runtime.onMessage.addListener((message) => {
+    if (message.action === 'resetCloudProgress' && message.stage === 'cleared') {
+        document.getElementById('resetCloudStatus').textContent =
+            chrome.i18n.getMessage('optionsResetCloudClearedStatus', [String(message.deletedCount)]);
+    }
+});
+
 // Cloud-Daten komplett zurücksetzen und durch die Lesezeichen dieses
 // Browsers ersetzen - gedacht als Reparatur-Werkzeug, falls die Cloud-
 // Seite durch frühere Sync-Fehler durcheinandergeraten ist.

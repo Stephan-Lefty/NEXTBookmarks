@@ -349,6 +349,20 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
+### 0.1.7
+- **Much faster resetting and uploading**: deleting cloud data and
+  uploading new bookmarks used to send one request after another - with
+  ~300 bookmarks, a full "reset cloud" run therefore took several
+  minutes. Up to 8 requests now run concurrently (measured with
+  simulated latency: roughly 8× faster), without overwhelming the server
+  with unlimited parallel requests. In WebDAV mode, the bookmark list is
+  additionally cleared in one step when resetting, instead of being
+  traversed again for every single entry.
+- **Progress feedback when resetting**: as soon as the cloud has been
+  cleared, it now shows "X bookmarks deleted in the cloud. Now uploading
+  this browser's bookmarks…" - previously it just said "Resetting cloud
+  data…" for the entire run.
+
 ### 0.1.6
 - **Browser-agnostic folder paths**: the browser-specific root folder's
   name ("Bookmarks bar", "Other bookmarks", or e.g. "Bookmarks Menu" in

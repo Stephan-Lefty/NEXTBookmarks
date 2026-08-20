@@ -96,6 +96,22 @@ async function apiRequest(settings, path, options = {}) {
     return response.json();
 }
 
+// Arbeitet eine Liste mit begrenzter Gleichzeitigkeit ab. Nacheinander
+// wäre bei vielen Einträgen sehr langsam (jede REST-Anfrage kostet die
+// volle Netzwerk-Umlaufzeit), alle gleichzeitig würde den Server
+// überrennen - ein kleines Limit ist der brauchbare Mittelweg.
+async function runWithConcurrency(items, limit, worker) {
+    const queue = [...items];
+    const runners = Array.from({ length: Math.min(limit, queue.length) }, async () => {
+        while (queue.length) {
+            await worker(queue.shift());
+        }
+    });
+    await Promise.all(runners);
+}
+
+const REMOTE_REQUEST_CONCURRENCY = 8;
+
 // ---- Backend "Nextcloud-App": REST-API der eigenen Server-App ---------
 
 const restBackend = {
@@ -106,6 +122,13 @@ const restBackend = {
         apiRequest(settings, `/bookmarks/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     deleteRemoteBookmark: (settings, id) =>
         apiRequest(settings, `/bookmarks/${id}`, { method: 'DELETE' }),
+    // Alles auf einmal löschen: Die REST-API kennt keinen Sammel-Löschbefehl,
+    // also weiterhin eine Anfrage pro Lesezeichen - aber mehrere davon
+    // parallel statt streng nacheinander (bei einigen hundert Lesezeichen
+    // macht das den Unterschied zwischen Minuten und Sekunden).
+    clearAllRemoteBookmarks: (settings, remoteList) =>
+        runWithConcurrency(remoteList, REMOTE_REQUEST_CONCURRENCY,
+            (remote) => apiRequest(settings, `/bookmarks/${remote.id}`, { method: 'DELETE' })),
     // Jede REST-Anfrage speichert sofort - hier gibt es nichts nachzuholen.
     async commit() {},
 };
@@ -209,6 +232,15 @@ async function webdavDeleteRemoteBookmark(settings, id) {
     state.dirty = true;
 }
 
+// Alles auf einmal löschen: Beim WebDAV-Backend liegt ohnehin alles in
+// einer Datei - die Liste einmal leeren genügt, statt sie pro Eintrag
+// erneut zu durchlaufen (was quadratisch mit der Anzahl wachsen würde).
+async function webdavClearAllRemoteBookmarks(settings) {
+    const state = await webdavLoad(settings);
+    state.items = [];
+    state.dirty = true;
+}
+
 async function webdavCommit(settings) {
     const state = settings._webdav;
     if (!state || !state.dirty) return; // nichts geändert -> nichts zu schreiben
@@ -240,6 +272,7 @@ const webdavBackend = {
     createRemoteBookmark: webdavCreateRemoteBookmark,
     updateRemoteBookmark: webdavUpdateRemoteBookmark,
     deleteRemoteBookmark: webdavDeleteRemoteBookmark,
+    clearAllRemoteBookmarks: webdavClearAllRemoteBookmarks,
     commit: webdavCommit,
 };
 
@@ -481,12 +514,21 @@ async function resetCloudFromLocal() {
         const backend = getBackend(settings);
 
         const remoteList = await backend.fetchRemoteBookmarks(settings);
-        for (const remote of remoteList) {
-            await backend.deleteRemoteBookmark(settings, remote.id);
-        }
+        await backend.clearAllRemoteBookmarks(settings, remoteList);
         await backend.commit(settings);
 
         await saveSyncState(settings, {});
+
+        // Zwischenstand melden: Das anschließende Hochladen kann bei vielen
+        // Lesezeichen nochmal dauern - ohne dieses Signal sähe es die ganze
+        // Zeit so aus, als hinge der Vorgang. Läuft die Einstellungsseite
+        // gerade nicht (Fenster geschlossen), gibt es keinen Empfänger und
+        // sendMessage wirft - das ist hier unkritisch und wird verschluckt.
+        browser.runtime.sendMessage({
+            action: 'resetCloudProgress',
+            stage: 'cleared',
+            deletedCount: remoteList.length,
+        }).catch(() => {});
 
         // Derselbe Schutz wie syncBookmarks() (return true), aber ohne den
         // Lock zwischendurch loszulassen - sonst könnte ein automatischer
@@ -542,6 +584,9 @@ async function runSync() {
     }
 
     let created = 0, updated = 0, deleted = 0, conflicts = 0;
+    // Lokale Lesezeichen, die es auf dem Server noch nicht gibt. Werden in
+    // Schritt 1 nur gesammelt und danach gebündelt hochgeladen.
+    const pendingCreates = [];
 
     // 1) Alle lokalen Lesezeichen anhand ihrer stabilen Browser-ID abgleichen.
     for (const local of localList) {
@@ -580,14 +625,11 @@ async function runSync() {
             }
 
             if (!remote) {
-                const saved = await backend.createRemoteBookmark(settings, {
-                    url: local.url, title: local.title, folder: local.folder, position: local.position,
-                });
-                newSyncState[local.localId] = {
-                    remoteId: saved.id, url: local.url, title: local.title,
-                    folder: local.folder, position: local.position, updatedAt: saved.updatedAt,
-                };
-                handledRemoteIds.add(String(saved.id));
+                // Nicht sofort hochladen, sondern sammeln und nach der
+                // Schleife gebündelt abarbeiten (siehe unten) - sonst
+                // kostet jedes einzelne neue Lesezeichen eine volle
+                // Netzwerk-Umlaufzeit.
+                pendingCreates.push(local);
                 created++;
                 continue;
             }
@@ -636,6 +678,24 @@ async function runSync() {
             newSyncState[local.localId] = known;
         }
     }
+
+    // Die in Schritt 1 gesammelten neuen Lesezeichen jetzt gebündelt
+    // hochladen, mehrere gleichzeitig statt streng nacheinander. Die
+    // Reihenfolge der Anfragen spielt dabei keine Rolle: Die Sortierung
+    // hängt am mitgeschickten "position"-Feld, nicht am Zeitpunkt des
+    // Anlegens. Muss vor der Berechnung von claimedLocalUrls (unten) und
+    // damit vor Schritt 2 abgeschlossen sein, damit die dortige
+    // Duplikatsprüfung die neuen Einträge bereits kennt.
+    await runWithConcurrency(pendingCreates, REMOTE_REQUEST_CONCURRENCY, async (local) => {
+        const saved = await backend.createRemoteBookmark(settings, {
+            url: local.url, title: local.title, folder: local.folder, position: local.position,
+        });
+        newSyncState[local.localId] = {
+            remoteId: saved.id, url: local.url, title: local.title,
+            folder: local.folder, position: local.position, updatedAt: saved.updatedAt,
+        };
+        handledRemoteIds.add(String(saved.id));
+    });
 
     // Alle URLs, die nach Schritt 1 bereits einem lokalen Lesezeichen
     // zugeordnet sind (egal ob neu angelegt, aktualisiert oder unverändert
