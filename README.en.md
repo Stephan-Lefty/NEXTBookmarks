@@ -349,6 +349,18 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
+### 0.1.5
+- Fixed a critical bug: sync state (`syncState`) was only scoped per
+  server+account, not additionally per connection type. Switching from
+  WebDAV to Nextcloud app (or vice versa) on the same server/account
+  caused the old sync state to be wrongly applied to the new, still-empty
+  connection type - the safety net against mass deletion correctly
+  triggered as a result ("Safety abort: X out of X known bookmarks would
+  be deleted"). Sync state, the "first sync done" flag, and skipped
+  bookmarks are now additionally scoped by connection type - switching
+  connection types now cleanly starts with a fresh, unburdened state
+  instead of wrongly inheriting old data.
+
 ### 0.1.4
 - The "Nextcloud app (App Store)" connection type is selectable again in
   the settings (no longer grayed out) - the Nextcloud app has been
