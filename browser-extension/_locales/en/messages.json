@@ -145,20 +145,20 @@
     "onboardingHeading": {
         "message": "Welcome to NEXTBookmarks"
     },
-    "onboardingIntroPrefix": {
-        "message": "You currently have"
+    "onboardingImportFromCloudQuestion": {
+        "message": "Should your existing bookmarks from Nextcloud be imported into this browser?"
     },
-    "onboardingIntroSuffix": {
-        "message": "bookmarks in this browser. Should these be imported into your Nextcloud now?"
+    "onboardingUploadToCloudQuestion": {
+        "message": "Should your local bookmarks from this browser be uploaded to Nextcloud?"
     },
-    "onboardingImportYesButton": {
-        "message": "Yes, import"
+    "onboardingYesButton": {
+        "message": "Yes"
     },
-    "onboardingImportNoButton": {
-        "message": "No, skip"
+    "onboardingNoButton": {
+        "message": "No"
     },
     "onboardingImportDoneStatus": {
-        "message": "Done! $created$ bookmarks imported. You can close this window now.",
+        "message": "Done! $created$ bookmarks transferred. You can close this window now.",
         "placeholders": {
             "created": { "content": "$1" }
         }

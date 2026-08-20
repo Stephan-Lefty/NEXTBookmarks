@@ -76,11 +76,12 @@ document.getElementById('importSkipped').addEventListener('click', async () => {
 
     // Skip-Liste leeren, damit die zuvor übersprungenen Lesezeichen beim
     // nächsten Sync ganz normal wie neue lokale Lesezeichen behandelt
-    // und hochgeladen werden. Pro Server+Konto getrennt (siehe
-    // background.js/onboarding.js).
+    // und hochgeladen werden. Pro Server+Konto+Verbindungsart getrennt
+    // (siehe profileStorageKey() in background.js/onboarding.js).
+    const syncMode = document.getElementById('syncMode').value;
     const serverUrl = document.getElementById('serverUrl').value.replace(/\/$/, '');
     const username = document.getElementById('username').value;
-    await browser.storage.local.remove(`skippedUrls::${serverUrl}::${username}`);
+    await browser.storage.local.remove(`skippedUrls::${serverUrl}::${username}::${syncMode}`);
     const result = await browser.runtime.sendMessage({ action: 'sync' });
 
     importStatusEl.textContent = result?.success

@@ -17,36 +17,46 @@ async function getLocalBookmarkUrls() {
     return flattenTree(tree).map(n => n.url);
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const urls = await getLocalBookmarkUrls();
-    document.getElementById('count').textContent = urls.length;
-});
-
-document.getElementById('importYes').addEventListener('click', async () => {
+// Löst einen normalen (beidseitigen) Sync aus - unabhängig davon, ob die
+// Frage "aus der Cloud importieren" oder "in die Cloud hochladen" mit Ja
+// beantwortet wurde, ist das technisch derselbe Vorgang: background.js
+// gleicht in einem Durchlauf immer in beide Richtungen ab.
+async function runSyncAndShowResult() {
     const statusEl = document.getElementById('status');
     statusEl.textContent = chrome.i18n.getMessage('statusImporting');
 
-    // Löst denselben Sync aus wie der Button im Popup – lädt alle
-    // vorhandenen lokalen Lesezeichen zur Nextcloud hoch.
     const result = await browser.runtime.sendMessage({ action: 'sync' });
     await browser.storage.local.set({ importDecisionPending: false });
 
     statusEl.textContent = result?.success
         ? chrome.i18n.getMessage('onboardingImportDoneStatus', [String(result.created)])
         : chrome.i18n.getMessage('onboardingImportErrorStatus', [result?.error || chrome.i18n.getMessage('errorUnknown')]);
+}
+
+// Schritt 1: "Aus der Cloud importieren?"
+document.getElementById('importFromCloudYes').addEventListener('click', runSyncAndShowResult);
+
+document.getElementById('importFromCloudNo').addEventListener('click', () => {
+    document.getElementById('stepImport').hidden = true;
+    document.getElementById('stepUpload').hidden = false;
 });
 
-document.getElementById('importNo').addEventListener('click', async () => {
+// Schritt 2 (nur wenn Schritt 1 mit Nein beantwortet wurde): "In die Cloud hochladen?"
+document.getElementById('uploadToCloudYes').addEventListener('click', runSyncAndShowResult);
+
+document.getElementById('uploadToCloudNo').addEventListener('click', async () => {
     const statusEl = document.getElementById('status');
 
-    // Die aktuell vorhandenen Lesezeichen merken wir uns als "übersprungen":
-    // Der Sync ignoriert diese URLs dauerhaft, bis du sie manuell importierst
-    // (siehe Einstellungen). Neue Lesezeichen ab jetzt werden ganz normal
-    // synchronisiert. Pro Server+Konto getrennt gespeichert (siehe
-    // background.js), damit ein späterer Wechsel der Nextcloud-Verbindung
-    // nicht die Skip-Liste einer ganz anderen Cloud übernimmt.
-    const { serverUrl, username } = await browser.storage.sync.get(['serverUrl', 'username']);
-    const skippedUrlsKey = `skippedUrls::${serverUrl}::${username}`;
+    // Beide Fragen mit Nein beantwortet: Die aktuell vorhandenen lokalen
+    // Lesezeichen merken wir uns als "übersprungen" - der Sync ignoriert
+    // diese URLs dauerhaft, bis du sie manuell importierst (siehe
+    // Einstellungen). Neue Lesezeichen ab jetzt werden ganz normal
+    // synchronisiert. Pro Server+Konto+Verbindungsart getrennt gespeichert
+    // (siehe profileStorageKey() in background.js), damit ein späterer
+    // Wechsel der Nextcloud-Verbindung oder der Verbindungsart nicht die
+    // Skip-Liste eines ganz anderen Profils übernimmt.
+    const { serverUrl, username, syncMode } = await browser.storage.sync.get(['serverUrl', 'username', 'syncMode']);
+    const skippedUrlsKey = `skippedUrls::${serverUrl}::${username}::${syncMode || 'webdav'}`;
     const urls = await getLocalBookmarkUrls();
     await browser.storage.local.set({ [skippedUrlsKey]: urls, importDecisionPending: false });
 
