@@ -249,6 +249,13 @@
             "path": { "content": "$2" }
         }
     },
+    "errorMassRemoteDeleteGuard": {
+        "message": "Safety abort: $count$ out of $total$ bookmarks would be deleted on the SERVER - that's unusually many, so nothing was deleted. If they're missing locally on purpose (e.g. after clearing all bookmarks), use \"Delete cloud data and re-upload from this browser\" in the settings.",
+        "placeholders": {
+            "count": { "content": "$1" },
+            "total": { "content": "$2" }
+        }
+    },
     "errorMassDeleteGuard": {
         "message": "Safety abort: $count$ out of $known$ known bookmarks would be deleted - that's unusually many, so nothing was deleted. Please check that the correct server/account is configured before syncing again.",
         "placeholders": {

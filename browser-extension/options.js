@@ -147,6 +147,17 @@ document.getElementById('importBackupFile').addEventListener('change', async (ev
     backupStatusEl.textContent = chrome.i18n.getMessage('optionsBackupImportDoneStatus', [String(imported)]);
 });
 
+// Löscht den gemerkten Sync-Zustand ALLER Profile (Server+Konto+
+// Verbindungsart, siehe profileStorageKey() in background.js). Nötig,
+// wenn lokal alle Lesezeichen entfernt wurden: Ein zurückgebliebener
+// Sync-Zustand würde die fehlenden Lesezeichen sonst als "gelöscht"
+// interpretieren und die Löschung auf den Server übertragen.
+async function clearAllSyncState() {
+    const all = await browser.storage.local.get(null);
+    const keys = Object.keys(all).filter(k => k.startsWith('syncState::') || k.startsWith('firstSyncDone::'));
+    if (keys.length) await browser.storage.local.remove(keys);
+}
+
 // Sicherheitsabfrage für die Aktionen in der Gefahrenzone.
 //
 // Bewusst KEIN window.confirm(): Firefox zeigt solche modalen Dialoge in
@@ -219,6 +230,15 @@ setupDangerButton('deleteAllBookmarks', 'deleteAllStatus', 'optionsDeleteAllBook
             }
         }
     }
+
+    // WICHTIG: Auch den gemerkten Sync-Zustand zurücksetzen. Sonst würde
+    // der nächste Sync die eben gelöschten Lesezeichen für "vom Nutzer
+    // gelöscht" halten (sie sind bekannt, aber lokal nicht mehr da) und
+    // sie prompt auch auf dem SERVER löschen - also genau das Gegenteil
+    // dessen, was dieser Button bezweckt. Mit leerem Sync-Zustand gelten
+    // alle Server-Lesezeichen wieder als "neu, nie gesehen" und werden
+    // beim nächsten Sync heruntergeladen.
+    await clearAllSyncState();
 
     statusEl.textContent = skipped
         ? chrome.i18n.getMessage('optionsDeleteAllBookmarksDoneWithSkippedStatus', [String(count), String(skipped)])

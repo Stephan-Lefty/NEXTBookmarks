@@ -350,6 +350,18 @@ Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
 ### 0.1.7
+- **Fixed (data loss): after "Delete all local bookmarks", the next sync
+  wiped the cloud.** The stored sync state survived the deletion, so the
+  bookmarks counted as "known but removed locally" - which the sync
+  interpreted as a deliberate deletion and propagated to the server. The
+  sync state is now reset together with the bookmarks, so the next sync
+  downloads the cloud bookmarks again instead of deleting them.
+- **New safety net for the server side**: if a sync would delete more
+  than half of all bookmarks on the server, it now aborts with an error -
+  mirroring the existing protection for the local side. This also applies
+  when bookmarks disappear some other way (e.g. deleted by hand in the
+  browser). For the intentional case, "Delete cloud data and re-upload
+  from this browser" remains available.
 - **Fixed: "Delete all local bookmarks" did nothing on Firefox.** The
   confirmation used the browser's built-in dialog (`window.confirm`),
   which Firefox doesn't reliably show inside extension windows - so the

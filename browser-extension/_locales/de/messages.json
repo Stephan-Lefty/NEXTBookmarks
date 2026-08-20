@@ -249,6 +249,13 @@
             "path": { "content": "$2" }
         }
     },
+    "errorMassRemoteDeleteGuard": {
+        "message": "Sicherheitsabbruch: $count$ von $total$ Lesezeichen würden auf dem SERVER gelöscht - das ist ungewöhnlich viel und wurde daher NICHT ausgeführt. Fehlen sie lokal absichtlich (z.B. nach dem Leeren aller Lesezeichen), nutze in den Einstellungen \"Cloud-Daten löschen und von diesem Browser neu hochladen\".",
+        "placeholders": {
+            "count": { "content": "$1" },
+            "total": { "content": "$2" }
+        }
+    },
     "errorMassDeleteGuard": {
         "message": "Sicherheitsabbruch: $count$ von $known$ bekannten Lesezeichen würden gelöscht - das ist ungewöhnlich viel und wurde daher NICHT ausgeführt. Bitte prüfen, ob wirklich der richtige Server/das richtige Konto eingetragen ist, bevor erneut synchronisiert wird.",
         "placeholders": {
