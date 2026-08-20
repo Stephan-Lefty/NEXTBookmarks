@@ -264,7 +264,14 @@ function getBackend(settings) {
 // des Wurzelordners liegt, wird als Pfad gespeichert - beim Herunterladen
 // landet das dann automatisch im jeweils eigenen Wurzelordner des
 // Zielbrowsers (siehe ensureLocalFolder()).
+//
+// Zusätzlich kann in den Einstellungen ein einzelner Ordnername
+// (skipFolderName) hinterlegt werden, der ebenfalls übersprungen wird, egal
+// auf welcher Ebene er vorkommt - z.B. "Schnellwahl" bei Vivaldi, damit
+// dessen Gruppen direkt im Wurzelordner landen statt in einem zusätzlichen
+// Zwischenordner.
 async function getLocalBookmarksFlat() {
+    const { skipFolderName } = await browser.storage.sync.get(['skipFolderName']);
     const tree = await browser.bookmarks.getTree();
     const flat = [];
     let position = 0;
@@ -280,7 +287,8 @@ async function getLocalBookmarksFlat() {
                     position: position++,
                 });
             } else if (node.children) {
-                walk(node.children, [...pathParts, node.title].filter(Boolean));
+                const skip = node.title && skipFolderName && node.title === skipFolderName;
+                walk(node.children, skip ? pathParts : [...pathParts, node.title].filter(Boolean));
             }
         }
     }
@@ -445,6 +453,40 @@ async function syncBookmarks() {
     }
     syncInProgress = true;
     try {
+        return await runSync();
+    } finally {
+        syncInProgress = false;
+    }
+}
+
+// "Reparatur"-Funktion für den Fall, dass die Cloud-Seite durch frühere
+// Sync-Fehler durcheinandergeraten ist (verschachtelte/doppelte Ordner
+// o.ä.): Löscht ALLE Lesezeichen auf dem Server (für die aktuell
+// eingestellte Verbindungsart) und lädt danach die aktuellen lokalen
+// Lesezeichen dieses Browsers komplett neu hoch - der Browser wird damit
+// zur alleinigen Quelle der Wahrheit. Läuft unter demselben
+// syncInProgress-Schutz wie ein normaler Sync, damit währenddessen kein
+// automatischer Sync dazwischenfunkt.
+async function resetCloudFromLocal() {
+    if (syncInProgress) {
+        return { success: true, created: 0, updated: 0, deleted: 0, conflicts: 0 };
+    }
+    syncInProgress = true;
+    try {
+        const settings = await getSettings();
+        const backend = getBackend(settings);
+
+        const remoteList = await backend.fetchRemoteBookmarks(settings);
+        for (const remote of remoteList) {
+            await backend.deleteRemoteBookmark(settings, remote.id);
+        }
+        await backend.commit(settings);
+
+        await saveSyncState(settings, {});
+
+        // Derselbe Schutz wie syncBookmarks() (return true), aber ohne den
+        // Lock zwischendurch loszulassen - sonst könnte ein automatischer
+        // Sync genau in der Lücke dazwischenfunken.
         return await runSync();
     } finally {
         syncInProgress = false;
@@ -642,6 +684,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     if (message.action === 'checkImportPrompt') {
         maybeShowOnboarding().then(() => sendResponse({ done: true }));
+        return true;
+    }
+    if (message.action === 'resetCloud') {
+        resetCloudFromLocal().then(sendResponse).catch(err => sendResponse({ success: false, error: err.message }));
         return true;
     }
 });

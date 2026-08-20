@@ -13,12 +13,13 @@ document.getElementById('syncMode').addEventListener('change', updateSyncModeHin
 
 // Lädt gespeicherte Werte beim Öffnen der Seite
 document.addEventListener('DOMContentLoaded', async () => {
-    const data = await browser.storage.sync.get(['serverUrl', 'username', 'appPassword', 'syncMode', 'autoSyncMode']);
+    const data = await browser.storage.sync.get(['serverUrl', 'username', 'appPassword', 'syncMode', 'autoSyncMode', 'skipFolderName']);
     document.getElementById('syncMode').value = data.syncMode || 'webdav';
     document.getElementById('serverUrl').value = data.serverUrl || '';
     document.getElementById('username').value = data.username || '';
     document.getElementById('appPassword').value = data.appPassword || '';
     document.getElementById('autoSyncMode').value = data.autoSyncMode || 'onChange';
+    document.getElementById('skipFolderName').value = data.skipFolderName || '';
     updateSyncModeHint();
 });
 
@@ -40,6 +41,7 @@ document.getElementById('save').addEventListener('click', async () => {
     const username = document.getElementById('username').value;
     const appPassword = document.getElementById('appPassword').value;
     const autoSyncMode = document.getElementById('autoSyncMode').value;
+    const skipFolderName = document.getElementById('skipFolderName').value.trim();
     const statusEl = document.getElementById('status');
 
     // Statt pauschal beim Installieren Zugriff auf "alle Websites" zu
@@ -58,7 +60,7 @@ document.getElementById('save').addEventListener('click', async () => {
         return;
     }
 
-    await browser.storage.sync.set({ serverUrl, username, appPassword, syncMode, autoSyncMode });
+    await browser.storage.sync.set({ serverUrl, username, appPassword, syncMode, autoSyncMode, skipFolderName });
     statusEl.textContent = chrome.i18n.getMessage('optionsSavedStatus');
 
     // Falls noch offen: jetzt, wo Zugangsdaten vorhanden sind, die
@@ -138,6 +140,24 @@ document.getElementById('deleteAllBookmarks').addEventListener('click', async ()
     }
 
     statusEl.textContent = chrome.i18n.getMessage('optionsDeleteAllBookmarksDoneStatus', [String(count)]);
+});
+
+// Cloud-Daten komplett zurücksetzen und durch die Lesezeichen dieses
+// Browsers ersetzen - gedacht als Reparatur-Werkzeug, falls die Cloud-
+// Seite durch frühere Sync-Fehler durcheinandergeraten ist.
+document.getElementById('resetCloud').addEventListener('click', async () => {
+    if (!confirm(chrome.i18n.getMessage('optionsResetCloudConfirm'))) return;
+
+    const statusEl = document.getElementById('resetCloudStatus');
+    statusEl.textContent = chrome.i18n.getMessage('optionsResetCloudInProgress');
+
+    const result = await browser.runtime.sendMessage({ action: 'resetCloud' });
+
+    statusEl.textContent = result?.success
+        ? chrome.i18n.getMessage('popupStatusDone', [
+            String(result.created), String(result.updated), String(result.deleted),
+        ])
+        : chrome.i18n.getMessage('genericError', [result?.error || chrome.i18n.getMessage('errorUnknown')]);
 });
 
 // Passt die Fenstergröße nach dem Laden automatisch an den tatsächlichen

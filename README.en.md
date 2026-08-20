@@ -349,6 +349,19 @@ test instance (see section C above) whether a change works:
 Refers to the browser extension's version number
 (`browser-extension/manifest.json`), which is also shown in the popup.
 
+### 0.1.9
+- New setting "Folder name to skip during sync": a folder with exactly
+  this name is skipped when syncing (its contents end up one level
+  higher), regardless of which level it appears at - e.g. "Speed Dial" on
+  Vivaldi, so its groups land directly in the root folder instead of in
+  an extra intermediate folder. Only affects folders with exactly this
+  name, not a fixed level in general.
+- New "Delete cloud data and re-upload from this browser" button in the
+  danger zone: a repair tool for when the cloud side has gotten messy
+  from earlier sync bugs (nested/duplicate folders etc.) - deletes all
+  bookmarks on the server and re-uploads this browser's bookmarks
+  completely fresh.
+
 ### 0.1.8
 - Fixed the root cause of the folder-path duplication issue (see 0.1.6)
   instead of just catching it: the browser-specific root folder's name

@@ -85,6 +85,12 @@
     "optionsAutoSyncHint": {
         "message": "Die allererste Synchronisation zu einer neuen Verbindung muss immer manuell gestartet werden (Button \"Jetzt synchronisieren\"). Danach läuft es automatisch nach der hier gewählten Regel."
     },
+    "optionsSkipFolderNameLabel": {
+        "message": "Ordnername beim Sync überspringen:"
+    },
+    "optionsSkipFolderNameHint": {
+        "message": "Optional: Ein Ordner mit genau diesem Namen wird beim Synchronisieren übersprungen - sein Inhalt landet dann eine Ebene höher, egal auf welcher Ebene er vorkommt (z.B. \"Schnellwahl\" bei Vivaldi). Betrifft nur Ordner mit exakt diesem Namen."
+    },
     "optionsSaveButton": {
         "message": "Speichern"
     },
@@ -150,6 +156,18 @@
         "placeholders": {
             "count": { "content": "$1" }
         }
+    },
+    "optionsResetCloudDescription": {
+        "message": "Falls die Cloud-Daten durcheinandergeraten sind (z.B. verschachtelte/doppelte Ordner durch frühere Sync-Fehler): Löscht ALLE Lesezeichen auf dem Server (für die aktuell gewählte Verbindungsart) und lädt danach die Lesezeichen dieses Browsers komplett neu hoch - dieser Browser wird damit zur alleinigen Quelle der Wahrheit."
+    },
+    "optionsResetCloudButton": {
+        "message": "Cloud-Daten löschen und von diesem Browser neu hochladen"
+    },
+    "optionsResetCloudConfirm": {
+        "message": "Wirklich ALLE Lesezeichen auf dem Server unwiderruflich löschen und durch die Lesezeichen dieses Browsers ersetzen? Andere Geräte verlieren dadurch ihren bisherigen Abgleichsstand. Das kann nicht rückgängig gemacht werden."
+    },
+    "optionsResetCloudInProgress": {
+        "message": "Setze Cloud-Daten zurück…"
     },
     "statusImporting": {
         "message": "Importiere…"
