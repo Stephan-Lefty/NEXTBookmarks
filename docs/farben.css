@@ -1,0 +1,37 @@
+/* Die gemeinsame Farbpalette als CSS-Variablen.
+ *
+ * Erzeugt aus derselben Quelle wie farben.md - nicht von Hand gepflegt. Eine
+ * zweite, abgeschriebene Liste wiche früher oder später ab, und man fände es
+ * erst, wenn ein Knopf anders aussieht als der Rest.
+ *
+ * Die Palette gilt seit dem 2026-08-28 für alle Programme. Erklärt sind die
+ * Farben in farben.md.
+ */
+
+:root {
+  --blau: #1668e3;
+  --blau-hell: #0e8af6;
+  --blau-tief: #0047a7;
+  --rot: #c62828;
+  --gruen: #2e7d32;
+  --grund: #f7f9fc;
+  --flaeche: #ffffff;
+  --linie: #d6dde8;
+  --text: #3a4048;
+  --text-leise: #667080;
+  --verweis: #1668e3;
+}
+
+:root[data-thema="dunkel"] {
+  --blau: #1668e3;
+  --blau-hell: #0e8af6;
+  --blau-tief: #0047a7;
+  --rot: #ef9a9a;
+  --gruen: #81c784;
+  --grund: #20262f;
+  --flaeche: #2b323c;
+  --linie: #3a4048;
+  --text: #d6dde8;
+  --text-leise: #97a1ad;
+  --verweis: #6cb6ff;
+}
